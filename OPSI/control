@@ -1,0 +1,284 @@
+[Package]
+version: 8
+depends: 
+incremental: False
+
+[Product]
+type: localboot
+id: config-win10
+name: Configure Windows 10
+description: Configure various Windows 10 settings like lockscreen, hibernationboot, telemetry sending and update behavior.
+advice: 
+version: 4.0.7
+priority: 85
+licenseRequired: False
+productClasses: 
+setupScript: setup.opsiscript
+uninstallScript: 
+updateScript: 
+alwaysScript: 
+onceScript: 
+customScript: 
+userLoginScript: 
+
+[ProductProperty]
+type: bool
+name: disable_fast_boot
+description: Disable Fastboot for proper opsi startup
+default: True
+
+[ProductProperty]
+type: bool
+name: disable_lock_screen
+default: True
+
+[ProductProperty]
+type: bool
+name: disable_telemetry
+description: Disable telemetry data transmission
+default: True
+
+[ProductProperty]
+type: bool
+name: disable_cortana
+description: Disable Cortana assistant
+default: True
+
+[ProductProperty]
+type: bool
+name: disable_customer_experience
+description: Disable customer experience program
+default: True
+
+[ProductProperty]
+type: bool
+name: disable_mrt
+description: Disable Malicious Software Removal Tool
+default: True
+
+[ProductProperty]
+type: bool
+name: defer_upgrade
+description: Defer Windows 10 Upgrade
+default: True
+
+[ProductProperty]
+type: bool
+name: disable_onedrive_sync
+description: Disable the OneDrive file synchronization
+default: True
+
+[ProductProperty]
+type: unicode
+name: config_updates
+multivalue: False
+editable: False
+description: Set Windows-Update behavior
+values: ["AllowPeerToPeer", "LocalPeerToPeer", "MicrosoftOnly"]
+default: ["MicrosoftOnly"]
+
+[ProductProperty]
+type: bool
+name: disable_mac
+description: Disable Microsoft Account communication
+default: False
+
+[ProductProperty]
+type: bool
+name: disable_advertising_id
+description: Disable Microsoft Advertising ID
+default: False
+
+[ProductProperty]
+type: bool
+name: disable_updates
+description: Disable Windows Updates
+default: False
+
+[ProductProperty]
+type: bool
+name: disable_defender
+description: Disable Microsoft Windows Defender
+default: False
+
+[ProductProperty]
+type: bool
+name: disable_wifi_sense
+description: Disable Wi-Fi Sense
+default: False
+
+[ProductProperty]
+type: bool
+name: disable_sending_feedback
+description: Disable sending feedback and diagnostics
+default: False
+
+[ProductProperty]
+type: bool
+name: disable_font_streaming
+description: Disable font streaming of not installed fonts
+default: False
+
+[ProductProperty]
+type: bool
+name: defer_upgrade
+description: Defer Windows 10 Upgrade
+default: True
+
+[ProductProperty]
+type: bool
+name: flashplayer_autorun
+description: Adobe Flashplayer: allow autorun?
+default: False
+
+[ProductProperty]
+type: bool
+name: disable_location_sensors
+description: Disable location and sensor detection
+default: True
+
+[ProductProperty]
+type: bool
+name: online_search
+description: Disable online search during file or command search
+default: True
+
+[ProductProperty]
+type: bool
+name: disable_handwrite_sharing
+description: Tablet-PC: Disable sharing of handriting information
+default: True
+
+[ProductProperty]
+type: bool
+name: sync_settings
+description: Sync settings with AccountID
+default: False
+
+[ProductProperty]
+type: bool
+name: disable_smbv1
+description: Disable SMBV1 protocol
+default: False
+
+[ProductProperty]
+type: unicode
+name: change_power_plan
+multivalue: False
+editable: False
+description: Change the machine power plan
+values: ["balanced", "high_performance", "power_saver"]
+default: ["balanced"]
+
+[Changelog]
+config-win10 (4.0.7-8); stable; urgency=low
+
+  * fixed broken loginscript setup
+  * fixed autoroate disable when using disable_sensors property on Surface devices
+
+ -- Mathias Radtke <m.radtke@uib.de> Tue, 17 Oct 2017 14:50:00 +0200
+
+config-win10 (4.0.7-7); stable; urgency=low
+
+  * disable_smbv1 added
+  * power_plan added
+
+ -- Mathias Radtke <m.radtke@uib.de> Fri, 01 Sep 2017 15:40:00 +0200
+
+config-win10 (4.0.7-6); stable; urgency=low
+
+  * fixed various bugs in the script flow
+  * removed ProfileAction section
+  * removed force_login_script property -> actually did nothing
+  * removed boot_to_desktop property -> win81 legacy property
+
+ -- Mathias Radtke <m.radtke@uib.de> Tue, 09 May 2017 14:00:00 +0200
+
+config-win10 (4.0.7-5); stable; urgency=low
+
+  * deactivate adobe flash autorun
+  * disable location and sensors
+  * disable online search
+  * disable share of handwriting telemetry
+  * disable settings sync
+
+ -- Mathias Radtke <m.radtke@uib.de> Wed, 22 Feb 2017 10:42:00 +0100
+
+config-win10 (4.0.7-4); stable; urgency=low
+
+  * defer-upgrade: it's back
+
+ -- Mathias Radtke <m.radtke@uib.de> Tue, 24 Jan 2017 13:50:00 +0100
+
+config-win10 (4.0.7-3); stable; urgency=low
+
+  * disable_mac: fixed usage of wring registry key
+
+ -- Mathias Radtke <m.radtke@uib.de> Fri, 12 Dez 2016 14:32:00 +0100
+
+config-win10 (4.0.7-2); stable; urgency=low
+
+  * fixed syntax error in profile section
+
+ -- Mathias Radtke <m.radtke@uib.de> Thu, 08 Dec 2016 12:23:00 +0100
+
+config-win10 (4.0.7-1) ; testing urgency=low
+
+  * disable: windows updates, feedback sending, wifi sense, defender, account communication, advertising ID
+
+ -- m.radtke <m.radtke@uib.de> Tue, 10 Aug 2016 11:00:00 + 0200
+
+config-win10 (4.0.6-7) tetsing; urgency=low
+
+  * Added new property to disable the OneDrive application
+
+ -- m.radtke <m.radtke@uib.de> Mon, 23 Mar 2016 08:42:00 + 0100
+
+config-win10 (4.0.6-6) experimental; urgency=low
+
+  * Added option to defer upgrades (8 months) and updates (4 weeks)
+
+ -- m.radtke <m.radtke@uib.de> Mon, 15 Feb 2016 13:55:00 + 0100
+
+config-win10 (4.0.6-5) testing; urgency=low
+
+  * Added new property to disable update search
+
+ -- m.radtke <m.radtke@uib.de> Tue, 03 Nov 2015 14:30:00 + 0100
+
+config-win10 (4.0.6-4) experimental; urgency=low
+
+  * Added new property to change windows update behavior
+
+ -- m.radtke <m.radtke@uib.de> Tue, 15 Sep 2015 14:33:00 + 0200
+
+config-win10 (4.0.6-3) experimental; urgency=low
+
+  * diverged disable_telemetry into more properties
+
+ -- m.radtke <m.radtke@uib.de> Fri, 11 Sep 2015 15:31:00 + 0200
+
+config-win10 (4.0.6-2) experimental; urgency=low
+
+  * all reg entries change values
+  * removed disable_charms property
+
+ -- m.radtke <m.radtke@uib.de> Fri, 11 Sep 2015 11:10:00 + 0200
+
+config-win10 (4.0.6-1) experimental; urgency=low
+
+  * added all known windows 10 telemetry registry keys
+
+ -- m.radtke <m.radtke@uib.de> Thu, 10 Sep 2015 17:06:00 + 0200
+
+
+
+
+
+
+
+
+
+
+
+

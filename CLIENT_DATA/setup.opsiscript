@@ -1,0 +1,608 @@
+[Actions]
+requiredWinstVersion >= "4.11.4"
+setloglevel="7"
+
+if not ("Windows_NT" = GetOS)
+	LogError "This product is for Windows only"
+	isFatalError "Wrong OS"
+endif
+
+if CompareDotSeparatedNumbers(GetMsVersionInfo,"10") < "0"
+	LogError "This product is for Windows 10"
+	isFatalError "Wrong WinVer"
+endif
+
+Message=Windows config ......
+ShowBitMap "%ScriptPath%\winconfig.png" "Win Config"
+
+sub_define_vars
+sub_get_properties
+
+comment "do patches"
+
+if $disable_fast_boot$ = "true"
+	Winbatch_hibernate_off /runelevated
+	Registry_hklm_disable_fastboot /sysnative
+else
+	Winbatch_hibernate_on /runelevated
+endif
+
+switch $change_pp$
+	case "balanced"
+		Winbatch_power_balanced /runelevated
+	endcase
+	case "high_performance"
+		Winbatch_power_hp /runelevated
+	endcase
+	case "power_saver"
+		Winbatch_power_ps /runelevated
+	endcase
+EndSwitch
+
+if $disable_lock_screen$ = "true"
+	Registry_hklm_disable_lockscreen /sysnative
+else
+	Registry_hklm_enable_lockscreen /sysnative
+endif
+
+if $disable_telemetry$ = "true"
+	Registry_hklm_enable_MetaDataFromNetwork /sysnative
+	Registry_hklm_disable_telemetry /sysnative
+	Registry_hklm_disable_appcompat /sysnative
+	Registry_hklm_disable_policies_telemetry /sysnative
+else
+	Registry_hklm_disable_MetaDataFromNetwork /sysnative
+	Registry_hklm_enable_telemetry /sysnative
+	Registry_hklm_enable_appcompat /sysnative
+	Registry_hklm_enable_policies_telemetry /sysnative
+endif
+
+if $disable_mrt$ = "true"
+	Registry_hklm_enable_DontOfferThroughWUAU /sysnative
+else
+	Registry_hklm_disable_DontOfferThroughWUAU /sysnative
+endif
+
+if $disable_cortana$ = "true"
+	Registry_hklm_disable_cortana /sysnative
+else 
+	Registry_hklm_enable_cortana /sysnative
+endif
+
+if $disable_customer_experience$ = "true"
+	Registry_hklm_disable_ceip /sysnative
+else
+	Registry_hklm_enable_ceip /sysnative
+endif
+
+if $config_updates$ = "AllowPeerToPeer"
+	Registry_hklm_update_microsoft_p2p /sysnative
+	Registry_hklm_update_enable_search /sysnative
+else
+	if $config_updates$ = "LocalPeerToPeer"
+		Registry_hklm_update_local_p2p /sysnative
+		Registry_hklm_update_enable_search /sysnative
+	else
+		if $config_updates$ = "MicrosoftOnly"
+			Registry_hklm_update_no_p2p /sysnative
+			Registry_hklm_update_enable_search /sysnative
+		endif
+	endif
+endif
+
+if $disable_mac$ = "true"
+    Registry_hklm_disable_mac /sysnative
+else
+	Registry_hklm_enable_mac /sysnative
+endif
+
+if $defer_upgrade$ = "true"
+	Registry_hklm_enable_defer_upgrade /sysnative
+	Registry_hklm_defer_update_period_4_weeks /sysnative
+	Registry_hklm_defer_update_period_8_months /sysnative
+else
+	Registry_hklm_disable_defer_upgrade /sysnative
+	Registry_hklm_defer_update_period_0_weeks /sysnative
+	Registry_hklm_defer_update_period_0_months /sysnative
+endif
+
+if $disable_onedrive$ = "true"
+	Registry_hklm_disable_onedrive /sysnative
+else
+	Registry_hklm_enable_onedrive /sysnative
+endif
+
+if $disable_advertising_id$ = "true"
+	Registry_hklm_disable_advertising_id /sysnative
+else
+	Registry_hklm_enable_advertising_id /sysnative
+endif
+
+if $disable_updates$ = "true"
+	Registry_hklm_disable_updates /sysnative
+else
+	Registry_hklm_enable_updates /sysnative
+endif
+
+if  $disable_defender$ = "true"
+	Registry_hklm_disable_defender /sysnative
+else
+	Registry_hklm_enable_defender /sysnative
+endif
+
+if $disable_wifi_sense$ = "true"
+	Registry_hklm_disable_wifi_sense /sysnative
+else
+	Registry_hklm_enable_wifi_sense /sysnative
+endif
+
+if $disable_sending_feedback$ = "true"
+	Registry_hkcu_disable_sending_feedback /sysnative
+else
+	Registry_hkcu_enable_sending_feedback /sysnative
+endif
+
+if $disable_font_streaming$ = "true"
+	Registry_hklm_disable_font_streaming /sysnative
+else
+    Registry_hklm_enable_font_streaming /sysnative
+endif
+
+if $flashplayer_autorun$ = "false"
+        Registry_hklm_disable_flashplayer_autorun /sysnative
+else
+        Registry_hklm_enable_flashplayer_autorun /sysnative
+endif
+
+if $disable_location_sensors$ = "true"
+	Registry_hklm_disable_localization /sysnative
+else
+	Registry_hklm_enable_localization /sysnative
+endif
+
+if $online_search$ = "true"
+	Registry_hklm_disable_online_search /sysnative
+else
+	Registry_hklm_enable_online_search /sysnative
+endif
+
+if $handwrite$ = "true"
+	Registry_hklm_disable_handwrite_telemetry /sysnative
+else
+	Registry_hklm_enable_handwrite_telemetry /sysnative
+endif
+
+if $sync_settings$ = "false"
+	Registry_hklm_disable_settings_sync /sysnative
+else
+	Registry_hklm_enable_settings_sync /sysnative
+endif
+
+if $disable_smbv1$ = "true"
+	Registry_hklm_disable_smbv1 /sysnative
+else
+	Registry_hklm_enable_smbv1 /sysnative
+endif
+
+if GetScriptMode = "Machine" 
+        ExitWindows /Reboot
+endif
+
+;***********************
+;**    SUB-Sektion   ***
+;***********************
+
+[sub_define_vars]
+DefVar $boot_to_desktop$
+DefVar $disable_fast_boot$
+DefVar $disable_lock_screen$
+DefVar $disable_telemetry$
+DefVar $disable_cortana$
+DefVar $disable_customer_experience$
+DefVar $disable_mrt$
+DefVar $config_updates$
+DefVar $disable_mac$
+DefVar $disable_advertising_id$
+DefVar $disable_updates$
+DefVar $disable_defender$
+DefVar $disable_wifi_sense$
+DefVar $disable_sending_feedback$
+DefVar $disable_font_streaming$
+DefVar $defer_upgrade$
+DefVar $flashplayer_autorun$
+DefVar $disable_location_sensors$
+DefVar $online_search$
+DefVar $handwrite$
+DefVar $sync_settings$
+DefVar $disable_onedrive$
+DefVar $disable_smbv1$
+DefVar $change_pp$
+
+[sub_get_properties]
+Set $boot_to_desktop$ = GetProductProperty("boot_to_desktop", "true")
+Set $disable_fast_boot$ = GetProductProperty("disable_fast_boot", "true")
+Set $disable_lock_screen$ = GetProductProperty("disable_lock_screen", "False")
+Set $disable_telemetry$ = GetProductProperty("disable_telemetry", "true")
+Set $disable_cortana$ = GetProductProperty("disable_cortana", "true")
+Set $disable_customer_experience$ = GetProductProperty("disable_customer_experience", "true")
+Set $disable_mrt$ = GetProductProperty("disable_mrt", "true")
+Set $config_updates$ = GetProductProperty("config_updates", "AllowPeerToPeer")
+Set $disable_mac$ = GetProductProperty("disable_mac", "true")
+Set $disable_advertising_id$ = GetProductProperty("disable_advertising_id", "true")
+Set $disable_updates$ = GetProductProperty("disable_updates", "true")
+Set $disable_defender$ = GetProductProperty("disable_defender", "true")
+Set $disable_wifi_sense$ = GetProductProperty("disable_wifi_sense", "true")
+Set $disable_sending_feedback$ = GetProductProperty("disable_sending_feedback", "true")
+Set $disable_font_streaming$ = GetProductProperty("disable_font_streaming", "true")
+Set $flashplayer_autorun$ = GetProductProperty("flashplayer_autorun", "false")
+Set $disable_location_sensors$ = GetProductProperty("disable_location_sensors", "true")
+Set $online_search$ = GetProductProperty("online_search", "true")
+Set $handwrite$ = GetProductProperty("disable_handwrite_sharing", "true")
+Set $sync_settings$ = GetProductProperty("sync_settings", "false")
+Set $defer_upgrade$ = GetProductProperty("defer_upgrade", "true")
+Set $disable_onedrive$ = GetProductProperty("disable_onedrive_sync", "true")
+Set $disable_smbv1$ = GetProductProperty("disable_smbv1", "false")
+Set $change_pp$ = GetProductProperty("change_power_plan", "false")
+
+;***********************
+;**    HKLM-Entries ***
+;***********************
+
+[Registry_hklm_disable_fastboot]
+openkey [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Power]
+set "HiberbootEnabled"=reg_dword:0
+
+[Registry_hklm_disable_lockscreen]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Personalization]
+set "NoLockScreen"=reg_dword:1
+
+[Registry_hklm_enable_lockscreen]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Personalization]
+set "NoLockScreen"=reg_dword:0
+
+;http://winaero.com/blog/how-to-disable-telemetry-and-data-collection-in-windows-10/
+;http://www.zdnet.com/article/want-to-limit-windows-10-tracking-there-is-an-app-for-that/
+[Registry_hklm_enable_MetaDataFromNetwork]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Device Metadata]
+set "PreventDeviceMetadataFromNetwork"=reg_dword:1
+
+[Registry_hklm_disable_MetaDataFromNetwork]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Device Metadata]
+set "PreventDeviceMetadataFromNetwork"=reg_dword:0
+
+;https://docs.microsoft.com/en-us/windows/configuration/configure-windows-telemetry-in-your-organization
+[Registry_hklm_disable_telemetry]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
+set "AllowTelemetry"=reg_dword:0
+
+[Registry_hklm_enable_telemetry]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
+set "AllowTelemetry"=reg_dword:1
+
+;http://dreamlayers.blogspot.de/2015/06/if-malicious-software-removal-tool-wont.html
+;http://superuser.com/questions/98313/how-do-i-stop-getting-updates-for-windows-malicious-software-removal-tool-and-wi
+[Registry_hklm_enable_DontOfferThroughWUAU]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\MRT]
+set "DontOfferThroughWUAU"=reg_dword:1
+
+[Registry_hklm_disable_DontOfferThroughWUAU]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\MRT]
+set "DontOfferThroughWUAU"=reg_dword:0
+
+;https://msdn.microsoft.com/en-us/library/dd405474(v=vs.85).aspx
+[Registry_hklm_disable_ceip]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\SQMClient\Windows]
+set "CEIPEnable"=reg_dword:0
+
+[Registry_hklm_enable_ceip]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\SQMClient\Windows]
+set "CEIPEnable"=reg_dword:1
+
+;http://www-pc.uni-regensburg.de/systemsw/win10/settings.htm
+[Registry_hklm_disable_appcompat]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\AppCompat]
+set "AITEnable"=reg_dword:0
+set "DisableUAR"=reg_dword:1
+
+[Registry_hklm_enable_appcompat]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\AppCompat]
+set "AITEnable"=reg_dword:1
+set "DisableUAR"=reg_dword:0
+
+[Registry_hklm_disable_policies_telemetry]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection]
+set "AllowTelemetry"=reg_dword:0
+
+;http://www.pcworld.com/article/2949759/windows/killing-cortana-how-to-disable-windows-10s-info-hungry-digital-assistant.html
+;http://www.windowscentral.com/how-turn-cortana-and-stop-personal-data-gathering-windows-10
+[Registry_hklm_enable_policies_telemetry]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection]
+set "AllowTelemetry"=reg_dword:1
+
+;http://www-pc.uni-regensburg.de/systemsw/win10/settings.htm
+[Registry_hklm_disable_cortana]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search]
+set "AllowCortana"=reg_dword:0
+
+[Registry_hklm_enable_cortana]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search]
+set "AllowCortana"=reg_dword:1
+
+;https://answers.microsoft.com/en-us/windows/forum/windows_10-update/disable-windows-update-delivery-optimization/30f16447-2138-4cc6-ab1f-22b7e83b8c8d
+[Registry_hklm_update_microsoft_p2p]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization]
+set "DODownloadMode"=reg_dword:3
+
+[Registry_hklm_update_local_p2p]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization]
+set "DODownloadMode"=reg_dword:1
+
+[Registry_hklm_update_no_p2p]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization]
+set "DODownloadMode"=reg_dword:0
+
+; https://msdn.microsoft.com/en-us/library/dd939844(v=ws.10).aspx
+[Registry_hklm_update_disable_search]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update]
+set "AUOptions"=reg_dword:1
+
+[Registry_hklm_update_enable_search]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update]
+set "AUOptions"=reg_dword:4
+
+;https://docs.microsoft.com/en-us/windows/configuration/manage-connections-from-windows-operating-system-components-to-microsoft-services
+[Registry_hklm_disable_mac]
+openkey [HKLM\SYSTEM\CurrentControlSet\Services\wlidsvc]
+set "Start"=reg_dword:4
+
+[Registry_hklm_enable_mac]
+openkey [HKLM\SYSTEM\CurrentControlSet\Services\wlidsvc]
+set "Start"=reg_dword:0
+
+;https://social.technet.microsoft.com/Forums/azure/en-US/c8d95330-29f3-4d54-a8a9-abcaafa27992/windows-10-privacy-settings?forum=winserverGP
+[Registry_hklm_disable_advertising_id]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo]
+set "Enabled"=reg_dword:0
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost]
+set "EnableWebContentEvaluation"=reg_dword:0
+
+[Registry_hklm_enable_advertising_id]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo]
+set "Enabled"=reg_dword:1
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost]
+set "EnableWebContentEvaluation"=reg_dword:1
+
+;https://msdn.microsoft.com/en-us/library/dd939844(v=ws.10).aspx
+[Registry_hklm_disable_updates]
+openkey [HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate]
+set "DoNotConnectToWindowsUpdateInternetLocations"=reg_dword:1
+set "DisableWindowsUpdateAccess"=reg_dword:1
+openkey [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\WindowsStore\WindowsUpdate]
+set "AutoDownload"=reg_dword:5
+
+[Registry_hklm_enable_updates]
+openkey [HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate]
+set "DoNotConnectToWindowsUpdateInternetLocations"=reg_dword:0
+set "DisableWindowsUpdateAccess"=reg_dword:0
+openkey [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\WindowsStore\WindowsUpdate]
+set "AutoDownload"=reg_dword:4
+
+; https://social.technet.microsoft.com/Forums/en-US/62721efb-9eef-4ae3-a5bc-1333a1231dc0/disable-windows-defender?forum=win10itprogeneral
+[Registry_hklm_disable_defender]
+openkey [HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows Defender\Spynet]
+set "SpyNetReporting"=reg_dword:0
+set "SubmitSamplesConsent"=reg_dword:2
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender]
+set "DisableAntiSpyware"=reg_dword:1
+
+[Registry_hklm_enable_defender]
+openkey [HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows Defender\Spynet]
+set "SpyNetReporting"=reg_dword:1
+set "SubmitSamplesConsent"=reg_dword:0
+deletekey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\DisableAntiSpyware]
+
+;https://docs.microsoft.com/en-us/windows/configuration/manage-wifi-sense-in-enterprise
+[Registry_hklm_disable_wifi_sense]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config]
+set "AutoConnectAllowedOEM"=reg_dword:0
+
+[Registry_hklm_enable_wifi_sense]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config]
+set "AutoConnectAllowedOEM"=reg_dword:1
+
+; https://docs.microsoft.com/en-us/windows/configuration/manage-connections-from-windows-operating-system-components-to-microsoft-services
+[Registry_hklm_disable_font_streaming]
+openkey [HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\FontCache\Parameters]
+set "DisableFontProviders"=reg_dword:1
+
+[Registry_hklm_enable_font_streaming]
+openkey [HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\FontCache\Parameters]
+set "DisableFontProviders"=reg_dword:0
+
+;http://www.wintotal.de/updates-und-upgrades-unter-windows-10-im-griff/
+[Registry_hklm_enable_defer_upgrade]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings]
+set "DeferUpgrade"=reg_dword:1
+
+; https://docs.microsoft.com/en-us/windows/deployment/update/waas-configure-wufb
+[Registry_hklm_disable_defer_upgrade]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings]
+set "DeferUpgrade"=reg_dword:0
+
+[Registry_hklm_defer_update_period_4_weeks]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\current\device\Update]
+set "DeferUpdatePeriod"=reg_dword:4
+
+[Registry_hklm_defer_update_period_0_weeks]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\current\device\Update]
+set "DeferUpdatePeriod"=reg_dword:0
+
+[Registry_hklm_defer_update_period_8_months]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\current\device\Update]
+set "DeferUpgradePeriod"=reg_dword:8
+
+[Registry_hklm_defer_update_period_0_months]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\current\device\Update]
+set "DeferUpgradePeriod"=reg_dword:0
+
+;https://technet.microsoft.com/library/security/MS17-005
+[Registry_hklm_disable_flashplayer_autorun]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer\ActiveX Compatibility\{D27CDB6E-AE6D-11CF-96B8-444553540000}]
+set "Compatibility Flags"=reg_dword:00000400
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Internet Explorer\ActiveX Compatibility\{D27CDB6E-AE6D-11CF-96B8-444553540000}]
+set "Compatibility Flags"=reg_dword:00000400
+
+[Registry_hklm_enable_flashplayer_autorun]
+deletekey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer\ActiveX Compatibility\{D27CDB6E-AE6D-11CF-96B8-444553540000}]
+deletekey openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Internet Explorer\ActiveX Compatibility\{D27CDB6E-AE6D-11CF-96B8-444553540000}]
+
+;http://flowest.blogspot.de/2015/08/windows-10-datenschutz-per-registry.html
+[Registry_hklm_disable_localization]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors]
+set "DisableLocation"=reg_dword:00000001
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors]
+set "DisableLocationScripting"=reg_dword:00000001
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors]
+set "DisableWindowsLocationProvide"=reg_dword:00000001
+openkey [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration]
+set "Status"=reg_dword:0
+
+[Registry_hklm_enable_localization]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors]
+set "DisableLocation"=reg_dword:00000000
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors]
+set "DisableLocationScripting"=reg_dword:00000000
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors]
+set "DisableWindowsLocationProvide"=reg_dword:00000000
+openkey [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration]
+set "Status"=reg_dword:0
+
+;http://www.wintotal.de/tipparchiv/?id=2275
+[Registry_hklm_disable_online_search]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search]
+set "DisableWebSearch"=reg_dword:1
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Search]
+set "BingSearchEnabled"=reg_dword:0
+
+[Registry_hklm_enable_online_search]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search]
+set "DisableWebSearch"=reg_dword:0
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Search]
+set "BingSearchEnabled"=reg_dword:1
+
+;https://www.stigviewer.com/stig/windows_7/2012-08-22/finding/V-15704
+;https://www.windows-security.org/c60f66da12d91f4f0be57445a827e366/turn-off-handwriting-personalization-data-sharing
+[Registry_hklm_disable_handwrite_telemetry]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\TabletPC]
+set "PreventHandwritingDataSharing"=reg_dword:1
+openkey [HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\HandwritingErrorReports]
+set "PreventHandwritingErrorReports"=reg_dword:1
+
+[Registry_hklm_enable_handwrite_telemetry]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\TabletPC]
+set "PreventHandwritingDataSharing"=reg_dword:0
+openkey [HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\HandwritingErrorReports]
+set "PreventHandwritingErrorReports"=reg_dword:0
+
+;https://www.tenforums.com/tutorials/4077-sync-settings-turn-off-windows-10-a.html
+[Registry_hklm_disable_settings_sync]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync]
+set "SyncPolicy"=reg_dword:1
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Personalization]
+set "Enabled"=reg_dword:0
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\BrowserSettings]
+set "Enabled"=reg_dword:0
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Credentials]
+set "Enabled"=reg_dword:0
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Language]
+set "Enabled"=reg_dword:0
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Accessibility]
+set "Enabled"=reg_dword:0
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Windows]
+set "Enabled"=reg_dword:0
+
+[Registry_hklm_enable_settings_sync]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync]
+set "SyncPolicy"=reg_dword:0
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Personalization]
+set "Enabled"=reg_dword:1
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\BrowserSettings]
+set "Enabled"=reg_dword:1
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Credentials]
+set "Enabled"=reg_dword:1
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Language]
+set "Enabled"=reg_dword:1
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Accessibility]
+set "Enabled"=reg_dword:1
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Windows]
+set "Enabled"=reg_dword:1
+
+;https://techjourney.net/disable-or-uninstall-onedrive-completely-in-windows-10/
+[Registry_hklm_disable_onedrive]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows]
+set "DisableFileSyncNGSC"=reg_dword:1
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Onedrive]
+set "DisableLibrariesDefaultSaveToOneDrive"=reg_dword:1
+set "DisableFileSync"=reg_dword:1
+set "DisableMeteredNetworkFileSync"=reg_dword:1
+
+[Registry_hklm_enable_onedrive]
+openKey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows]
+set "DisableFileSyncNGSC"=reg_dword:0
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Onedrive]
+set "DisableLibrariesDefaultSaveToOneDrive"=reg_dword:0
+set "DisableFileSync"=reg_dword:0
+set "DisableMeteredNetworkFileSync"=reg_dword:0
+
+;***********************
+;**    HKCU-Enties ***
+;***********************
+
+;http://www.techattend.com/disable-charms-bar-in-windows-8-1/
+;http://winaero.com/blog/how-to-disable-the-edge-panels-charms-bar-and-switcher-in-windows-8/
+[Registry_hkcu_charms_off]
+openkey [HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ImmersiveShell\EdgeUI]
+set "DisableCharmsHint"=reg_dword:1
+
+[Registry_hkcu_charms_on]
+openkey [HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ImmersiveShell\EdgeUI]
+set "DisableCharmsHint"=reg_dword:0
+
+[Registry_hkcu_disable_sending_feedback]
+openkey [HKEY_CURRENT_USER\Software\Microsoft\Siuf\Rules]
+set "PeriodInNanoSeconds"=reg_dword:0
+set "NumberOfSIUFInPeriod"=reg_dword:0
+
+[Registry_hkcu_enable_sending_feedback]
+openkey [HKEY_CURRENT_USER\Software\Microsoft\Siuf\Rules]
+set "PeriodInNanoSeconds"=reg_dword:6048000000000
+set "NumberOfSIUFInPeriod"=reg_dword:1
+
+[Registry_hklm_disable_smbv1]
+openkey [HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters]
+set "SMB1"=reg_dword:0
+
+[Registry_hklm_enable_smbv1]
+openkey [HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters]
+set "SMB1"=reg_dword:1
+
+
+;***********************
+;**    Winbatch ***
+;***********************
+
+;http://blogs.technet.com/b/keithmayer/archive/2012/11/05/supporting-windows-8-fast-startup-with-group-policy.aspx
+[Winbatch_hibernate_off]
+powercfg /hibernate off
+
+[Winbatch_hibernate_on]
+powercfg /hibernate on
+
+[Winbatch_power_hp]
+powercfg /s 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+
+[Winbatch_power_balanced]
+powercfg /s 381b4222-f694-41f0-9685-ff5bb260df2e
+
+[Winbatch_power_ps]
+powercfg /s a1841308-3541-4fab-bc81-f71556f20b4a

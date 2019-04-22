@@ -1,0 +1,200 @@
+[Package]
+version: 1
+depends:
+incremental: False
+
+[Product]
+type: localboot
+id: config-win81-desktop
+name: Windows Customizing
+description: Anpassung von Windows XP / Vista / Win7 Einstellungen
+advice: 
+version: 4.0.5
+priority: 0
+licenseRequired: False
+productClasses:
+setupScript: setup.ins
+uninstallScript: 
+updateScript: 
+alwaysScript: 
+onceScript: 
+customScript: 
+userLoginScript: setup.ins
+
+[ProductProperty]
+type: unicode
+name: flag_screensaveactive
+multivalue: False
+editable: False
+description: Activate screen saver
+values: ["off", "on"]
+default: ["off"]
+
+[ProductProperty]
+type: unicode
+name: flag_firewall
+multivalue: False
+editable: False
+description: Enable firewall
+values: ["off", "on"]
+default: ["on"]
+
+[ProductProperty]
+type: unicode
+name: flag_usb
+multivalue: False
+editable: False
+description: Enable use of USB Storage Devices
+values: ["off", "on"]
+default: ["on"]
+
+[ProductProperty]
+type: unicode
+name: flag_nowindowstour
+multivalue: False
+editable: False
+description: No Windows Tour
+values: ["0", "1"]
+default: ["1"]
+
+[ProductProperty]
+type: unicode
+name: flag_noerrorreport
+multivalue: False
+editable: False
+description: No error report to Microsoft
+values: ["0", "1"]
+default: ["1"]
+
+[ProductProperty]
+type: unicode
+name: flag_noautoruncd
+multivalue: False
+editable: False
+description: No CD Autorun
+values: ["0", "1"]
+default: ["1"]
+
+[ProductProperty]
+type: unicode
+name: flag_noballoons
+multivalue: False
+editable: False
+description: No Hints (Sprechblasen)
+values: ["0", "1"]
+default: ["1"]
+
+[ProductProperty]
+type: unicode
+name: flag_classicstartmenu
+multivalue: False
+editable: False
+description: Classic Start Menu
+values: ["0", "1"]
+default: ["1"]
+
+[ProductProperty]
+type: unicode
+name: flag_classiccontrol
+multivalue: False
+editable: False
+description: Klassische Systemsteuerung
+values: ["0", "1"]
+default: ["1"]
+
+[ProductProperty]
+type: unicode
+name: flag_numlockon
+multivalue: False
+editable: False
+description: Numlock On
+values: ["0", "1"]
+default: ["0"]
+
+[ProductProperty]
+type: unicode
+name: flag_explorer
+multivalue: False
+editable: False
+description: Masterflag: Do Explorer Settings
+values: ["0", "1"]
+default: ["1"]
+
+[ProductProperty]
+type: unicode
+name: flag_explorer_showsystemfiles
+multivalue: False
+editable: False
+description: 1=Show protected system files and directories
+values: ["0", "1"]
+default: ["1"]
+
+[ProductProperty]
+type: unicode
+name: val_explorer_classicviewstate
+multivalue: False
+editable: False
+description: Ansicht nicht fuer jeden Ordner einzeln speichern
+values: ["0", "1"]
+default: ["1"]
+
+[ProductProperty]
+type: unicode
+name: val_explorer_hidefileext
+multivalue: False
+editable: False
+description: hide known file extensions
+values: ["0", "1"]
+default: ["0"]
+
+[ProductProperty]
+type: unicode
+name: val_explorer_hidden
+multivalue: False
+editable: False
+description: 1=alle Dateien anzeigen  2=versteckte ausblenden
+values: ["1", "2"]
+default: ["2"]
+
+[ProductProperty]
+type: unicode
+name: val_explorer_webview
+multivalue: False
+editable: False
+description: use web view
+values: ["0", "1"]
+default: ["0"]
+
+[ProductProperty]
+type: unicode
+name: flag_waitfornetwork
+multivalue: False
+editable: False
+description: Beim Start auf Netzwerk warten
+values: ["0", "1"]
+default: ["1"]
+
+[ProductProperty]
+type: unicode
+name: flag_i386pathc
+multivalue: False
+editable: True
+description: Suchpfad fuer I386 verändern 0=wird nicht geändert
+values: ["0", "c:\\\"", "d:\\"]
+default: ["0"]
+
+[ProductProperty]
+type: unicode
+name: force_login_script
+multivalue: False
+editable: False
+description: userLoginScript wiederholt ausfÃƒÂ¼hren
+values: ["off", "on"]
+default: ["off"]
+
+[Changelog]
+config-win81-desktop (4.0.5-1) testing; urgency=low
+
+  * Initial version
+
+ -- d.oertel <d.oertel@uib.de> Fri, 16 Jan 2015 12:50:20 + 0100
