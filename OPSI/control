@@ -1,5 +1,5 @@
 [Package]
-version: 6
+version: 7
 depends: 
 
 [Product]
@@ -8,7 +8,7 @@ id: config-win10
 name: Configure Windows 10
 description: Configure various Windows 10 settings like lockscreen, hibernationboot, telemetry sending and update behavior.
 advice: 
-version: 4.1.1
+version: 4.1.2
 priority: 85
 licenseRequired: False
 productClasses: 
@@ -18,7 +18,7 @@ updateScript:
 alwaysScript: 
 onceScript: 
 customScript: 
-userLoginScript:
+userLoginScript: 
 
 [ProductProperty]
 type: bool
@@ -60,7 +60,7 @@ default: False
 type: bool
 name: hide_known_file_extensions
 description: Hide known and most famous file extensions, like .exe or .txt
-default: True
+default: False
 
 [ProductProperty]
 type: bool
@@ -135,19 +135,19 @@ multivalue: False
 editable: False
 description: Set Windows-Update behavior to select prefered way of Windows 10 updates/upgrades.
 values: ["AllowPeerToPeer", "LocalPeerToPeer", "MicrosoftOnly"]
-default: ["MicrosoftOnly"]
+default: ["LocalPeerToPeer"]
 
 [ProductProperty]
 type: bool
 name: disable_mac
 description: Disable Microsoft Account communication, as it saves browser, search, position and Cortana data.
-default: False
+default: True
 
 [ProductProperty]
 type: bool
 name: disable_advertising_id
 description: Disable Microsoft Advertising ID
-default: False
+default: True
 
 [ProductProperty]
 type: bool
@@ -183,7 +183,7 @@ default: False
 type: bool
 name: disable_sending_feedback
 description: Disable sending feedback and diagnostics
-default: False
+default: True
 
 [ProductProperty]
 type: bool
