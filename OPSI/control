@@ -124,12 +124,6 @@ default: True
 
 [ProductProperty]
 type: bool
-name: defer_upgrade
-description: Defer Windows 10 Upgrade for 8 months and updates for 4 weeks. After 8 Months Windows 10 might be upgraded, feature updates aren't installed for 4 weeks. Security updates are installed anyway.
-default: True
-
-[ProductProperty]
-type: bool
 name: disable_onedrive_sync
 description: Disable the OneDrive file synchronization, the OneDrive program remains installed.
 default: True
