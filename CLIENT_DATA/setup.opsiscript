@@ -239,26 +239,6 @@ if GetScriptMode = "Machine"
 		endif
 	endif
 
-	if $defer_upgrade$ = "true"
-		Registry_hklm_enable_defer_upgrade /sysnative
-		Registry_hklm_defer_update_period_4_weeks /sysnative
-		Registry_hklm_defer_update_period_8_months /sysnative
-		if ($INST_SystemType$ = "64 Bit System")
-			Registry_hklm_enable_defer_upgrade 
-			Registry_hklm_defer_update_period_4_weeks
-			Registry_hklm_defer_update_period_8_months
-		endif
-	else
-		Registry_hklm_disable_defer_upgrade /sysnative
-		Registry_hklm_defer_update_period_0_weeks /sysnative
-		Registry_hklm_defer_update_period_0_months /sysnative
-		if ($INST_SystemType$ = "64 Bit System")
-			Registry_hklm_disable_defer_upgrade
-			Registry_hklm_defer_update_period_0_weeks 
-			Registry_hklm_defer_update_period_0_months
-		endif
-	endif
-
 	if $disable_onedrive$ = "true"
 		Registry_hklm_disable_onedrive /sysnative
 		if ($INST_SystemType$ = "64 Bit System")
@@ -441,17 +421,6 @@ if GetScriptMode = "Machine"
 	else
 		Registry_hklm_enable_app_notification
 	endif
-	Registry_hklm_deferfeatureupdatesperiodindays_policy /sysnative
-	Registry_hklm_deferqualityupdatesperiodindays_policy /sysnative
-	if ($INST_SystemType$ = "64 Bit System")
-	  Registry_hklm_deferfeatureupdatesperiodindays_policy 
-	  Registry_hklm_deferqualityupdatesperiodindays_policy
-	  
-	  Registry_hklm_deferfeatureupdatesperiodindays 
-      Registry_hklm_deferqualityupdatesperiodindays 
-	endif
-	Registry_hklm_deferfeatureupdatesperiodindays /sysnative
-    Registry_hklm_deferqualityupdatesperiodindays /sysnative
 	ExitWindows /Reboot
 endif
 
@@ -528,14 +497,6 @@ if GetScriptMode = "Login"
 	else
 		Registry_hkcu_enable_settings_sync
 	endif
-	; we reset this "soft" settings
-	Registry_hklm_deferfeatureupdatesperiodindays /sysnative
-        Registry_hklm_deferqualityupdatesperiodindays /sysnative
-   	if ($INST_SystemType$ = "64 Bit System")
-	  
-	  Registry_hklm_deferfeatureupdatesperiodindays 
-          Registry_hklm_deferqualityupdatesperiodindays 
-	endif
 
 endif
 
@@ -559,7 +520,6 @@ DefVar $disable_defender$
 DefVar $disable_wifi_sense$
 DefVar $disable_sending_feedback$
 DefVar $disable_font_streaming$
-DefVar $defer_upgrade$
 DefVar $flashplayer_autorun$
 DefVar $disable_location_sensors$
 DefVar $online_search$
@@ -582,8 +542,6 @@ DefVar $show_drive_letter_first$
 DefVar $show_thispc_instead_of_quicklaunch$ 
 DefVar $show_all_folder_in_navbar$
 DefVar $disable_app_suggestion_in_startmenu$
-DefVar $deferfeatureupdatesperiodindays$
-DefVar $deferqualityupdatesperiodindays$
 
 [sub_get_properties]
 Set $disable_fast_boot$ = GetProductProperty("disable_fast_boot", "true")
@@ -606,7 +564,6 @@ Set $disable_location_sensors$ = GetProductProperty("disable_location_sensors", 
 Set $online_search$ = GetProductProperty("online_search", "true")
 Set $handwrite$ = GetProductProperty("disable_handwrite_sharing", "true")
 Set $sync_settings$ = GetProductProperty("sync_settings", "false")
-Set $defer_upgrade$ = GetProductProperty("defer_upgrade", "true")
 Set $disable_onedrive$ = GetProductProperty("disable_onedrive_sync", "true")
 Set $disable_smbv1$ = GetProductProperty("disable_smbv1", "false")
 Set $no_new_app_install_notification$ = GetproductProperty("no_new_app_install_notification", "false")
@@ -624,13 +581,7 @@ set $show_thispc_instead_of_quicklaunch$ = GetProductProperty("show_thispc_inste
 set $show_all_folder_in_navbar$ = GetProductProperty("show_all_folder_in_navbar", "true")
 set $disable_app_suggestion_in_startmenu$ = GetProductProperty("disable_app_suggestion_in_startmenu", "true")
 
-set $deferfeatureupdatesperiodindays$ = GetProductProperty("deferfeatureupdatesperiodindays", "365")
-;set $deferfeatureupdatesperiodindays$ = DecStrToHexStr($deferfeatureupdatesperiodindays$,"3")
-set $deferfeatureupdatesperiodindays$ = " REG_DWORD:" + $deferfeatureupdatesperiodindays$
 
-set $deferqualityupdatesperiodindays$ = GetProductProperty("deferqualityupdatesperiodindays", "35")
-;set $deferqualityupdatesperiodindays$ = DecStrToHexStr($deferqualityupdatesperiodindays$,"3")
-set $deferqualityupdatesperiodindays$ = " REG_DWORD:" + $deferqualityupdatesperiodindays$
 
 Set $INST_SystemType$ = GetSystemType
 
@@ -861,32 +812,6 @@ set "DisableFontProviders"=reg_dword:1
 [Registry_hklm_enable_font_streaming]
 openkey [HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\FontCache\Parameters]
 set "DisableFontProviders"=reg_dword:0
-
-;http://www.wintotal.de/updates-und-upgrades-unter-windows-10-im-griff/
-[Registry_hklm_enable_defer_upgrade]
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings]
-set "DeferUpgrade"=reg_dword:1
-
-; https://docs.microsoft.com/en-us/windows/deployment/update/waas-configure-wufb
-[Registry_hklm_disable_defer_upgrade]
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings]
-set "DeferUpgrade"=reg_dword:0
-
-[Registry_hklm_defer_update_period_4_weeks]
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\current\device\Update]
-set "DeferUpdatePeriod"=reg_dword:4
-
-[Registry_hklm_defer_update_period_0_weeks]
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\current\device\Update]
-set "DeferUpdatePeriod"=reg_dword:0
-
-[Registry_hklm_defer_update_period_8_months]
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\current\device\Update]
-set "DeferUpgradePeriod"=reg_dword:8
-
-[Registry_hklm_defer_update_period_0_months]
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\current\device\Update]
-set "DeferUpgradePeriod"=reg_dword:0
 
 ;https://technet.microsoft.com/library/security/MS17-005
 [Registry_hklm_disable_flashplayer_autorun]
@@ -1207,27 +1132,6 @@ set "NavPaneShowAllFolders"=reg_dword:1
 [Registry_hkcu_hide_all_folders]
 openkey [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
 set "NavPaneShowAllFolders"=reg_dword:0
-
-;https://docs.microsoft.com/en-us/windows/deployment/update/waas-configure-wufb
-[Registry_hklm_deferfeatureupdatesperiodindays_policy]
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\\Policies\Microsoft\Windows\WindowsUpdate]
-;Set "DeferFeatureUpdatesPeriodInDays"="$deferfeatureupdatesperiodindays$"
-Set "DeferFeatureUpdatesPeriodInDays"=$deferfeatureupdatesperiodindays$
-
-[Registry_hklm_deferqualityupdatesperiodindays_policy]
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\\Policies\Microsoft\Windows\WindowsUpdate]
-;Set "DeferQualityUpdatesPeriodInDays"="$deferqualityupdatesperiodindays$"
-Set "DeferQualityUpdatesPeriodInDays"=$deferqualityupdatesperiodindays$
-
-[Registry_hklm_deferfeatureupdatesperiodindays]
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings]
-;Set "DeferFeatureUpdatesPeriodInDays"="$deferfeatureupdatesperiodindays$"
-Set "DeferFeatureUpdatesPeriodInDays"=$deferfeatureupdatesperiodindays$
-
-[Registry_hklm_deferqualityupdatesperiodindays] 
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings]
-;Set "DeferQualityUpdatesPeriodInDays"="$deferqualityupdatesperiodindays$"
-Set "DeferQualityUpdatesPeriodInDays"=$deferqualityupdatesperiodindays$
 
 ;***********************
 ;**    Winbatch ***
