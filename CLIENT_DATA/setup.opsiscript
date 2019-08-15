@@ -19,173 +19,524 @@ sub_define_vars
 sub_get_properties
 
 comment "do patches"
-
-if $disable_fast_boot$ = "true"
-	Winbatch_hibernate_off /runelevated
-	Registry_hklm_disable_fastboot /sysnative
-else
-	Winbatch_hibernate_on /runelevated
-endif
-
-switch $change_pp$
-	case "balanced"
-		Winbatch_power_balanced /runelevated
-	endcase
-	case "high_performance"
-		Winbatch_power_hp /runelevated
-	endcase
-	case "power_saver"
-		Winbatch_power_ps /runelevated
-	endcase
-EndSwitch
-
-if $disable_lock_screen$ = "true"
-	Registry_hklm_disable_lockscreen /sysnative
-else
-	Registry_hklm_enable_lockscreen /sysnative
-endif
-
-if $disable_telemetry$ = "true"
-	Registry_hklm_enable_MetaDataFromNetwork /sysnative
-	Registry_hklm_disable_telemetry /sysnative
-	Registry_hklm_disable_appcompat /sysnative
-	Registry_hklm_disable_policies_telemetry /sysnative
-else
-	Registry_hklm_disable_MetaDataFromNetwork /sysnative
-	Registry_hklm_enable_telemetry /sysnative
-	Registry_hklm_enable_appcompat /sysnative
-	Registry_hklm_enable_policies_telemetry /sysnative
-endif
-
-if $disable_mrt$ = "true"
-	Registry_hklm_enable_DontOfferThroughWUAU /sysnative
-else
-	Registry_hklm_disable_DontOfferThroughWUAU /sysnative
-endif
-
-if $disable_cortana$ = "true"
-	Registry_hklm_disable_cortana /sysnative
-else 
-	Registry_hklm_enable_cortana /sysnative
-endif
-
-if $disable_customer_experience$ = "true"
-	Registry_hklm_disable_ceip /sysnative
-else
-	Registry_hklm_enable_ceip /sysnative
-endif
-
-if $config_updates$ = "AllowPeerToPeer"
-	Registry_hklm_update_microsoft_p2p /sysnative
-	Registry_hklm_update_enable_search /sysnative
-else
-	if $config_updates$ = "LocalPeerToPeer"
-		Registry_hklm_update_local_p2p /sysnative
-		Registry_hklm_update_enable_search /sysnative
+if GetScriptMode = "Machine" 
+	if $disable_fast_boot$ = "true"
+		Winbatch_hibernate_off /runelevated
+		Registry_hklm_disable_fastboot /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_fastboot
+		endif
 	else
-		if $config_updates$ = "MicrosoftOnly"
-			Registry_hklm_update_no_p2p /sysnative
-			Registry_hklm_update_enable_search /sysnative
+		Winbatch_hibernate_on /runelevated
+	endif
+
+	if $minimize_recommendations$ = "true"
+		Registry_hkcu_minimize_recommendations /AllNTUserDats
+		Registry_hklm_minimize_recommendations /sysnative
+	else
+		Registry_hkcu_maximize_recommendations /AllNTUserDats
+		Registry_hklm_maximize_recommendations /sysnative
+	endif
+
+	switch $change_pp$
+		case "balanced"
+			Winbatch_power_balanced /runelevated
+		endcase
+		case "high_performance"
+			Winbatch_power_hp /runelevated
+		endcase
+		case "power_saver"
+			Winbatch_power_ps /runelevated
+		endcase
+	EndSwitch
+
+	if $show_all_folder_in_navbar$ = "true"
+		Registry_hkcu_show_all_folders /AllNTUserDats
+	else
+	    	Registry_hkcu_hide_folders /AllNTUserDats
+	endif
+
+	if $show_thispc_instead_of_quicklaunch$ = "true"
+	    	Registry_hkcu_thispc_yes /AllNTUserDats
+	else
+    		Registry_hkcu_thispc_no /AllNTUserDats
+	endif
+
+	if $show_drive_letter_first$ = "true"
+	    	Registry_hklm_drive_letter_first /sysnative
+	else
+    		Registry_hklm_drive_letter_last /sysnative
+	endif
+
+	if $hide_known_file_extensions$ = "true"
+	    	Registry_hkcu_hide_ext /AllNtUserDats
+	else
+    		Registry_hkcu_unhide_ext /AllNtUserDats
+	endif
+
+	if $allow_useractivity_publishing$ = "false"
+	    	Registry_hklm_dont_publish /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+	    	  Registry_hklm_dont_publish
+		endif
+	else
+    		Registry_hklm_do_publish /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+    		  Registry_hklm_do_publish
 		endif
 	endif
+
+	if $disable_lock_screen$ = "true"
+		Registry_hklm_disable_lockscreen /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_lockscreen
+		endif
+	else
+		Registry_hklm_enable_lockscreen /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_lockscreen
+		endif
+	endif
+
+	if $disable_telemetry$ = "true"
+		Registry_hklm_disable_MetaDataFromNetwork /sysnative
+		Registry_hklm_disable_telemetry /sysnative
+		Registry_hklm_disable_appcompat /sysnative
+		Registry_hklm_disable_policies_telemetry /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_MetaDataFromNetwork 
+			Registry_hklm_disable_telemetry 
+			Registry_hklm_disable_appcompat 
+			Registry_hklm_disable_policies_telemetry 
+		endif
+	else
+		Registry_hklm_enable_MetaDataFromNetwork /sysnative
+		Registry_hklm_enable_telemetry /sysnative
+		Registry_hklm_enable_appcompat /sysnative
+		Registry_hklm_enable_policies_telemetry /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_MetaDataFromNetwork 
+			Registry_hklm_enable_telemetry 
+			Registry_hklm_enable_appcompat 
+			Registry_hklm_enable_policies_telemetry 
+		endif
+	endif
+
+	if $disable_app_suggestion_in_startmenu$ = "true"
+	    	Registry_hkcu_disable_app_suggestion /AllNtUSerdats
+	else
+    		Registry_hkcu_enable_app_suggestion /AllNtUSerdats
+	endif
+
+	if $remove_edge_from_desktop$ = "true"
+	    	Registry_hklm_remove_edge_desktop /sysnative
+	else
+    		Registry_hklm_add_edge_desktop /sysnative
+	endif
+
+	if $disable_mrt$ = "true"
+		Registry_hklm_enable_DontOfferThroughWUAU /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_DontOfferThroughWUAU
+		endif
+	else
+		Registry_hklm_disable_DontOfferThroughWUAU /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_DontOfferThroughWUAU
+		endif
+	endif
+
+	if $disable_cortana$ = "true"
+		Registry_hklm_disable_cortana /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_cortana 
+		endif
+	else 
+		Registry_hklm_enable_cortana /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_cortana
+		endif
+	endif
+
+	if $disable_recent_apps$ = "true"
+	    	Registry_hkcu_disable_recent_apps /AllNTUserDats
+	else
+	    	Registry_hkcu_enable_recent_apps /AllNTUserDats
+	endif    
+
+	if $disable_push_install$ = "true"
+    		Registry_hklm_disable_push /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+    		  Registry_hklm_disable_push
+		endif
+	else
+	    	Registry_hklm_enable_push /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+	    	  Registry_hklm_enable_push 
+		endif
+	endif
+
+	if $disable_suggested_silent_app_installation$ = "true"
+	    	Registry_hkcu_disable_suggested_apps /AllNTUserDats
+	else
+    		Registry_hkcu_enable_suggested_apps /AllNTUserDats
+	endif
+
+	if $disable_customer_experience$ = "true"
+		Registry_hklm_disable_ceip /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_ceip 
+		endif
+	else
+		Registry_hklm_enable_ceip /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_ceip
+		endif
+	endif
+
+	if $config_updates$ = "AllowPeerToPeer"
+		Registry_hklm_update_microsoft_p2p /sysnative
+		;Registry_hklm_update_enable_search /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_update_microsoft_p2p 
+			;Registry_hklm_update_enable_search 
+		endif
+	else
+		if $config_updates$ = "LocalPeerToPeer"
+			Registry_hklm_update_local_p2p /sysnative
+			;Registry_hklm_update_enable_search /sysnative
+			if ($INST_SystemType$ = "64 Bit System")
+				Registry_hklm_update_local_p2p 
+				;Registry_hklm_update_enable_search
+			endif
+		else
+			if $config_updates$ = "MicrosoftOnly"
+				Registry_hklm_update_no_p2p /sysnative
+				;Registry_hklm_update_enable_search /sysnative
+				if ($INST_SystemType$ = "64 Bit System")
+					Registry_hklm_update_no_p2p 
+					;Registry_hklm_update_enable_search 
+				endif
+			endif
+		endif
+	endif
+
+	if $disable_error_report$ = "true"
+	    	Registry_hkcu_disable_error_report /ALLNTUSERDATS
+	else
+	    	Registry_hkcu_enable_error_report /ALLNTUSERDATS
+	endif
+
+	if $disable_mac$ = "true"
+		Registry_hklm_disable_mac /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_mac
+		endif
+	else
+		Registry_hklm_enable_mac /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_mac 
+		endif
+	endif
+
+	if $defer_upgrade$ = "true"
+		Registry_hklm_enable_defer_upgrade /sysnative
+		Registry_hklm_defer_update_period_4_weeks /sysnative
+		Registry_hklm_defer_update_period_8_months /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_defer_upgrade 
+			Registry_hklm_defer_update_period_4_weeks
+			Registry_hklm_defer_update_period_8_months
+		endif
+	else
+		Registry_hklm_disable_defer_upgrade /sysnative
+		Registry_hklm_defer_update_period_0_weeks /sysnative
+		Registry_hklm_defer_update_period_0_months /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_defer_upgrade
+			Registry_hklm_defer_update_period_0_weeks 
+			Registry_hklm_defer_update_period_0_months
+		endif
+	endif
+
+	if $disable_onedrive$ = "true"
+		Registry_hklm_disable_onedrive /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_onedrive
+		endif
+	else
+		Registry_hklm_enable_onedrive /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_onedrive 
+		endif
+	endif
+
+	if $disable_advertising_id$ = "true"
+		Registry_hkcu_disable_advertising_id /AllNTUserDats /sysnative
+		Registry_hklm_disable_advertising_id /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hkcu_disable_advertising_id /AllNTUserDats 
+			Registry_hklm_disable_advertising_id 
+		endif
+	else
+		Registry_hkcu_enable_advertising_id /AllNTUserDats /sysnative
+		Registry_hklm_enable_advertising_id /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hkcu_enable_advertising_id /AllNTUserDats
+			Registry_hklm_enable_advertising_id 
+		endif
+	endif
+
+	if $disable_updates$ = "true"
+		Registry_hklm_update_disable_search /sysnative
+		Registry_hklm_disable_updates /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_update_disable_search
+			Registry_hklm_disable_updates
+		endif
+	else
+		Registry_hklm_update_enable_search /sysnative
+		Registry_hklm_enable_updates /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_update_enable_search
+			Registry_hklm_enable_updates 
+		endif
+	endif
+
+	if $disable_update_service$ = "true"
+		ShellInAnIcon_disable_update_service
+	else
+		ShellInAnIcon_enable_update_service
+	endif
+
+	if  $disable_defender$ = "true"
+		Registry_hklm_disable_defender /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_defender 
+		endif
+	else
+		Registry_hklm_enable_defender /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_defender
+		endif
+	endif
+
+	if $disable_wifi_sense$ = "true"
+		Registry_hklm_disable_wifi_sense /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_wifi_sense
+		endif
+	else
+		Registry_hklm_enable_wifi_sense /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_wifi_sense
+		endif
+	endif
+
+	if $disable_sending_feedback$ = "true"
+		Registry_hkcu_disable_sending_feedback /AllNTUserDats /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hkcu_disable_sending_feedback /AllNTUserDats
+		endif
+	else
+		Registry_hkcu_enable_sending_feedback /AllNTUserDats /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hkcu_enable_sending_feedback /AllNTUserDats
+		endif
+	endif
+
+	if $disable_font_streaming$ = "true"
+		Registry_hklm_disable_font_streaming /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_font_streaming
+		endif
+	else
+    		Registry_hklm_enable_font_streaming /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+    			Registry_hklm_enable_font_streaming
+		endif
+	endif
+
+	if $flashplayer_autorun$ = "false"
+		Registry_hklm_disable_flashplayer_autorun /32Bit
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_flashplayer_autorun /sysnative
+			Registry_hklm_disable_flashplayer_autorun /32Bit
+		endif
+	else
+		Registry_hklm_enable_flashplayer_autorun /32Bit
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_flashplayer_autorun /sysnative
+			Registry_hklm_enable_flashplayer_autorun /32Bit
+		endif
+	endif
+
+	if $disable_location_sensors$ = "true"
+		Registry_hklm_disable_localization /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_localization
+		endif
+	else
+		Registry_hklm_enable_localization /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_localization 
+		endif
+	endif
+
+	if $online_search$ = "true"
+		Registry_hklm_disable_online_search /sysnative
+		Registry_hkcu_disable_online_search /AllNTUserDats /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_online_search
+			Registry_hkcu_disable_online_search /AllNTUserDats
+		endif
+	else
+		Registry_hklm_enable_online_search /sysnative
+		Registry_hkcu_enable_online_search /AllNTUserDats /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_online_search 
+			Registry_hkcu_enable_online_search /AllNTUserDats
+		endif
+	endif
+
+	if $handwrite$ = "true"
+		Registry_hklm_disable_handwrite_telemetry /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_handwrite_telemetry
+		endif
+	else
+		Registry_hklm_enable_handwrite_telemetry /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_handwrite_telemetry
+		endif
+	endif
+
+	if $sync_settings$ = "false"
+		Registry_hklm_disable_settings_sync /sysnative
+		Registry_hkcu_disable_settings_sync /AllNTUserDats 
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_settings_sync 
+		endif
+	else
+		Registry_hklm_enable_settings_sync /sysnative
+		Registry_hkcu_enable_settings_sync /AllNTUserDats 
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_settings_sync 
+		endif
+	endif
+
+	if $disable_smbv1$ = "true"
+		Registry_hklm_disable_smbv1 /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_disable_smbv1 
+		endif
+	else
+		Registry_hklm_enable_smbv1 /sysnative
+		if ($INST_SystemType$ = "64 Bit System")
+			Registry_hklm_enable_smbv1
+		endif
+	endif
+	if $no_new_app_install_notification$ = "true"
+		Registry_hklm_disable_app_notification /sysnative
+	else
+		Registry_hklm_enable_app_notification
+	endif
+	Registry_hklm_deferfeatureupdatesperiodindays_policy /sysnative
+	Registry_hklm_deferqualityupdatesperiodindays_policy /sysnative
+	if ($INST_SystemType$ = "64 Bit System")
+	  Registry_hklm_deferfeatureupdatesperiodindays_policy 
+	  Registry_hklm_deferqualityupdatesperiodindays_policy
+	  
+	  Registry_hklm_deferfeatureupdatesperiodindays 
+      Registry_hklm_deferqualityupdatesperiodindays 
+	endif
+	Registry_hklm_deferfeatureupdatesperiodindays /sysnative
+    Registry_hklm_deferqualityupdatesperiodindays /sysnative
+	ExitWindows /Reboot
 endif
 
-if $disable_mac$ = "true"
-    Registry_hklm_disable_mac /sysnative
-else
-	Registry_hklm_enable_mac /sysnative
-endif
+if GetScriptMode = "Login"
+	if $minimize_recommendations$ = "true"
+		Registry_hkcu_minimize_recommendations 
+	else
+		Registry_hkcu_maximize_recommendations
+	endif
 
-if $defer_upgrade$ = "true"
-	Registry_hklm_enable_defer_upgrade /sysnative
-	Registry_hklm_defer_update_period_4_weeks /sysnative
-	Registry_hklm_defer_update_period_8_months /sysnative
-else
-	Registry_hklm_disable_defer_upgrade /sysnative
-	Registry_hklm_defer_update_period_0_weeks /sysnative
-	Registry_hklm_defer_update_period_0_months /sysnative
-endif
+	if $show_all_folder_in_navbar$ = "true"
+		Registry_hkcu_show_all_folders
+	else
+	    	Registry_hkcu_hide_folders 
+	endif
 
-if $disable_onedrive$ = "true"
-	Registry_hklm_disable_onedrive /sysnative
-else
-	Registry_hklm_enable_onedrive /sysnative
-endif
+	if $show_thispc_instead_of_quicklaunch$ = "true"
+	    	Registry_hkcu_thispc_yes 
+	else
+    		Registry_hkcu_thispc_no 
+	endif
 
-if $disable_advertising_id$ = "true"
-	Registry_hklm_disable_advertising_id /sysnative
-else
-	Registry_hklm_enable_advertising_id /sysnative
-endif
+	if $hide_known_file_extensions$ = "true"
+	    	Registry_hkcu_hide_ext
+	else
+    		Registry_hkcu_unhide_ext
+	endif
 
-if $disable_updates$ = "true"
-	Registry_hklm_disable_updates /sysnative
-else
-	Registry_hklm_enable_updates /sysnative
-endif
+	if $disable_app_suggestion_in_startmenu$ = "true"
+	    	Registry_hkcu_disable_app_suggestion 
+	else
+    		Registry_hkcu_enable_app_suggestion 
+	endif
 
-if  $disable_defender$ = "true"
-	Registry_hklm_disable_defender /sysnative
-else
-	Registry_hklm_enable_defender /sysnative
-endif
+	if $disable_recent_apps$ = "true"
+	    	Registry_hkcu_disable_recent_apps 
+	else
+	    	Registry_hkcu_enable_recent_apps 
+	endif    
 
-if $disable_wifi_sense$ = "true"
-	Registry_hklm_disable_wifi_sense /sysnative
-else
-	Registry_hklm_enable_wifi_sense /sysnative
-endif
+	if $disable_suggested_silent_app_installation$ = "true"
+	    	Registry_hkcu_disable_suggested_apps
+	else
+    		Registry_hkcu_enable_suggested_apps
+	endif
+	
+	if $disable_error_report$ = "true"
+	    	Registry_hkcu_disable_error_report
+	else
+	    	Registry_hkcu_enable_error_report
+	endif
 
-if $disable_sending_feedback$ = "true"
-	Registry_hkcu_disable_sending_feedback /sysnative
-else
-	Registry_hkcu_enable_sending_feedback /sysnative
-endif
 
-if $disable_font_streaming$ = "true"
-	Registry_hklm_disable_font_streaming /sysnative
-else
-    Registry_hklm_enable_font_streaming /sysnative
-endif
+	if $disable_advertising_id$ = "true"
+		Registry_hkcu_disable_advertising_id
+	else
+		Registry_hkcu_enable_advertising_id
+	endif
 
-if $flashplayer_autorun$ = "false"
-        Registry_hklm_disable_flashplayer_autorun /sysnative
-else
-        Registry_hklm_enable_flashplayer_autorun /sysnative
-endif
+	if $disable_sending_feedback$ = "true"
+		Registry_hkcu_disable_sending_feedback
+	else
+		Registry_hkcu_enable_sending_feedback
+	endif
 
-if $disable_location_sensors$ = "true"
-	Registry_hklm_disable_localization /sysnative
-else
-	Registry_hklm_enable_localization /sysnative
-endif
+	if $online_search$ = "true"
+		Registry_hkcu_disable_online_search
+	else
+		Registry_hkcu_enable_online_search 
+	endif
 
-if $online_search$ = "true"
-	Registry_hklm_disable_online_search /sysnative
-else
-	Registry_hklm_enable_online_search /sysnative
-endif
+	if $sync_settings$ = "false"
+		Registry_hkcu_disable_settings_sync
+	else
+		Registry_hkcu_enable_settings_sync
+	endif
+	; we reset this "soft" settings
+	Registry_hklm_deferfeatureupdatesperiodindays /sysnative
+        Registry_hklm_deferqualityupdatesperiodindays /sysnative
+   	if ($INST_SystemType$ = "64 Bit System")
+	  
+	  Registry_hklm_deferfeatureupdatesperiodindays 
+          Registry_hklm_deferqualityupdatesperiodindays 
+	endif
 
-if $handwrite$ = "true"
-	Registry_hklm_disable_handwrite_telemetry /sysnative
-else
-	Registry_hklm_enable_handwrite_telemetry /sysnative
-endif
-
-if $sync_settings$ = "false"
-	Registry_hklm_disable_settings_sync /sysnative
-else
-	Registry_hklm_enable_settings_sync /sysnative
-endif
-
-if $disable_smbv1$ = "true"
-	Registry_hklm_disable_smbv1 /sysnative
-else
-	Registry_hklm_enable_smbv1 /sysnative
-endif
-
-if GetScriptMode = "Machine" 
-        ExitWindows /Reboot
 endif
 
 ;***********************
@@ -193,7 +544,6 @@ endif
 ;***********************
 
 [sub_define_vars]
-DefVar $boot_to_desktop$
 DefVar $disable_fast_boot$
 DefVar $disable_lock_screen$
 DefVar $disable_telemetry$
@@ -204,6 +554,7 @@ DefVar $config_updates$
 DefVar $disable_mac$
 DefVar $disable_advertising_id$
 DefVar $disable_updates$
+DefVar $disable_update_service$
 DefVar $disable_defender$
 DefVar $disable_wifi_sense$
 DefVar $disable_sending_feedback$
@@ -216,10 +567,25 @@ DefVar $handwrite$
 DefVar $sync_settings$
 DefVar $disable_onedrive$
 DefVar $disable_smbv1$
+DefVar $no_new_app_install_notification$
 DefVar $change_pp$
+DefVar $INST_SystemType$
+DefVar $minimize_recommendations$
+DefVar $disable_error_report$
+DefVar $allow_useractivity_publishing$
+DefVar $disable_suggested_silent_app_installation$
+DefVar $disable_push_install$
+DefVar $disable_recent_apps$
+DefVar $hide_known_file_extensions$
+DefVar $remove_edge_from_desktop$
+DefVar $show_drive_letter_first$
+DefVar $show_thispc_instead_of_quicklaunch$ 
+DefVar $show_all_folder_in_navbar$
+DefVar $disable_app_suggestion_in_startmenu$
+DefVar $deferfeatureupdatesperiodindays$
+DefVar $deferqualityupdatesperiodindays$
 
 [sub_get_properties]
-Set $boot_to_desktop$ = GetProductProperty("boot_to_desktop", "true")
 Set $disable_fast_boot$ = GetProductProperty("disable_fast_boot", "true")
 Set $disable_lock_screen$ = GetProductProperty("disable_lock_screen", "False")
 Set $disable_telemetry$ = GetProductProperty("disable_telemetry", "true")
@@ -230,6 +596,7 @@ Set $config_updates$ = GetProductProperty("config_updates", "AllowPeerToPeer")
 Set $disable_mac$ = GetProductProperty("disable_mac", "true")
 Set $disable_advertising_id$ = GetProductProperty("disable_advertising_id", "true")
 Set $disable_updates$ = GetProductProperty("disable_updates", "true")
+Set $disable_update_service$ = GetProductProperty("disable_update_service", "true")
 Set $disable_defender$ = GetProductProperty("disable_defender", "true")
 Set $disable_wifi_sense$ = GetProductProperty("disable_wifi_sense", "true")
 Set $disable_sending_feedback$ = GetProductProperty("disable_sending_feedback", "true")
@@ -242,7 +609,30 @@ Set $sync_settings$ = GetProductProperty("sync_settings", "false")
 Set $defer_upgrade$ = GetProductProperty("defer_upgrade", "true")
 Set $disable_onedrive$ = GetProductProperty("disable_onedrive_sync", "true")
 Set $disable_smbv1$ = GetProductProperty("disable_smbv1", "false")
+Set $no_new_app_install_notification$ = GetproductProperty("no_new_app_install_notification", "false")
 Set $change_pp$ = GetProductProperty("change_power_plan", "false")
+set $minimize_recommendations$ = GetProductProperty("minimize_recommendations", "false")
+set $disable_error_report$ = GetProductProperty("disable_error_report", "false")
+set $allow_useractivity_publishing$ = GetProductProperty("allow_useractivity_publishing", "false")
+set $disable_suggested_silent_app_installation$ = GetproductProperty("disable_suggested_silent_app_installation", "true")
+set $disable_push_install$ = GetProductProperty("disable_push_install", "true")
+set $disable_recent_apps$ = GetProductProperty("disable_recent_apps", "true")
+set $hide_known_file_extensions$ = GetProductProperty("hide_known_file_extensions", "true")
+set $remove_edge_from_desktop$ = GetProductProperty("remove_edge_from_desktop", "true")
+set $show_drive_letter_first$ = GetProductProperty("show_drive_letter_first", "true")
+set $show_thispc_instead_of_quicklaunch$ = GetProductProperty("show_thispc_instead_of_quicklaunch", "true")
+set $show_all_folder_in_navbar$ = GetProductProperty("show_all_folder_in_navbar", "true")
+set $disable_app_suggestion_in_startmenu$ = GetProductProperty("disable_app_suggestion_in_startmenu", "true")
+
+set $deferfeatureupdatesperiodindays$ = GetProductProperty("deferfeatureupdatesperiodindays", "365")
+;set $deferfeatureupdatesperiodindays$ = DecStrToHexStr($deferfeatureupdatesperiodindays$,"3")
+set $deferfeatureupdatesperiodindays$ = " REG_DWORD:" + $deferfeatureupdatesperiodindays$
+
+set $deferqualityupdatesperiodindays$ = GetProductProperty("deferqualityupdatesperiodindays", "35")
+;set $deferqualityupdatesperiodindays$ = DecStrToHexStr($deferqualityupdatesperiodindays$,"3")
+set $deferqualityupdatesperiodindays$ = " REG_DWORD:" + $deferqualityupdatesperiodindays$
+
+Set $INST_SystemType$ = GetSystemType
 
 ;***********************
 ;**    HKLM-Entries ***
@@ -260,24 +650,51 @@ set "NoLockScreen"=reg_dword:1
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Personalization]
 set "NoLockScreen"=reg_dword:0
 
+; http://www.informatik-berlin.de/tipps/windows/showdrivelettersfirst-im-windows-explorer.html
+[Registry_hklm_drive_letter_first]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer]
+set "ShowDriveLettersFirst"=reg_dword:4
+
+[Registry_hklm_drive_letter_last]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer]
+set "ShowDriveLettersFirst"=reg_dword:0
+
 ;http://winaero.com/blog/how-to-disable-telemetry-and-data-collection-in-windows-10/
 ;http://www.zdnet.com/article/want-to-limit-windows-10-tracking-there-is-an-app-for-that/
+;https://docs.microsoft.com/en-us/windows/configuration/manage-connections-from-windows-operating-system-components-to-microsoft-services
 [Registry_hklm_enable_MetaDataFromNetwork]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Device Metadata]
+set "PreventDeviceMetadataFromNetwork"=reg_dword:0
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Device Metadata]
 set "PreventDeviceMetadataFromNetwork"=reg_dword:1
 
 [Registry_hklm_disable_MetaDataFromNetwork]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Device Metadata]
 set "PreventDeviceMetadataFromNetwork"=reg_dword:0
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Device Metadata]
+set "PreventDeviceMetadataFromNetwork"=reg_dword:1
+
+[Registry_hklm_remove_edge_desktop]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer]
+set "DisableEdgeDesktopShortcutCreation"=reg_dword:1
+
+[Registry_hklm_add_edge_desktop]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer]
+set "DisableEdgeDesktopShortcutCreation"=reg_dword:0
 
 ;https://docs.microsoft.com/en-us/windows/configuration/configure-windows-telemetry-in-your-organization
+;http://www-pc.uni-regensburg.de/systemsw/win10/settings.htm
 [Registry_hklm_disable_telemetry]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
 set "AllowTelemetry"=reg_dword:0
+openkey [HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack]
+set "DiagTrackAuthorization"=reg_dword:0
 
 [Registry_hklm_enable_telemetry]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
 set "AllowTelemetry"=reg_dword:1
+openkey [HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack]
+set "DiagTrackAuthorization"=reg_dword:1
 
 ;http://dreamlayers.blogspot.de/2015/06/if-malicious-software-removal-tool-wont.html
 ;http://superuser.com/questions/98313/how-do-i-stop-getting-updates-for-windows-malicious-software-removal-tool-and-wi
@@ -290,24 +707,33 @@ openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\MRT]
 set "DontOfferThroughWUAU"=reg_dword:0
 
 ;https://msdn.microsoft.com/en-us/library/dd405474(v=vs.85).aspx
+; https://www.windowsmanagementexperts.com/disabling-windows-10-consumer-experience/disabling-windows-10-consumer-experience.htm
 [Registry_hklm_disable_ceip]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\SQMClient\Windows]
 set "CEIPEnable"=reg_dword:0
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent]
+set "DisableWindowsConsumerFeatures"=reg_dword:1
 
 [Registry_hklm_enable_ceip]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\SQMClient\Windows]
 set "CEIPEnable"=reg_dword:1
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent]
+set "DisableWindowsConsumerFeatures"=reg_dword:0
 
 ;http://www-pc.uni-regensburg.de/systemsw/win10/settings.htm
+; https://www.stigviewer.com/stig/windows_7/2014-04-02/finding/V-21971
 [Registry_hklm_disable_appcompat]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\AppCompat]
 set "AITEnable"=reg_dword:0
 set "DisableUAR"=reg_dword:1
+set "DisableInventory"=reg_dword:1
 
+;https://docs.microsoft.com/en-us/windows/configuration/manage-connections-from-windows-operating-system-components-to-microsoft-services
 [Registry_hklm_enable_appcompat]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\AppCompat]
 set "AITEnable"=reg_dword:1
 set "DisableUAR"=reg_dword:0
+set "DisableInventory"=reg_dword:0
 
 [Registry_hklm_disable_policies_telemetry]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection]
@@ -323,12 +749,15 @@ set "AllowTelemetry"=reg_dword:1
 [Registry_hklm_disable_cortana]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search]
 set "AllowCortana"=reg_dword:0
+set "ExplainAllowCortana"=reg_dword:0
 
 [Registry_hklm_enable_cortana]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search]
 set "AllowCortana"=reg_dword:1
+set "ExplainAllowCortana"=reg_dword:1
 
 ;https://answers.microsoft.com/en-us/windows/forum/windows_10-update/disable-windows-update-delivery-optimization/30f16447-2138-4cc6-ab1f-22b7e83b8c8d
+; https://docs.microsoft.com/en-us/windows/configuration/manage-connections-from-windows-operating-system-components-to-microsoft-services
 [Registry_hklm_update_microsoft_p2p]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization]
 set "DODownloadMode"=reg_dword:3
@@ -342,6 +771,7 @@ openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimiza
 set "DODownloadMode"=reg_dword:0
 
 ; https://msdn.microsoft.com/en-us/library/dd939844(v=ws.10).aspx
+; https://superuser.com/questions/837946/disabling-windows-updates-for-windows-10/837949#837949
 [Registry_hklm_update_disable_search]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update]
 set "AUOptions"=reg_dword:1
@@ -359,33 +789,42 @@ set "Start"=reg_dword:4
 openkey [HKLM\SYSTEM\CurrentControlSet\Services\wlidsvc]
 set "Start"=reg_dword:0
 
-;https://social.technet.microsoft.com/Forums/azure/en-US/c8d95330-29f3-4d54-a8a9-abcaafa27992/windows-10-privacy-settings?forum=winserverGP
-[Registry_hklm_disable_advertising_id]
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo]
-set "Enabled"=reg_dword:0
-openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost]
-set "EnableWebContentEvaluation"=reg_dword:0
-
-[Registry_hklm_enable_advertising_id]
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo]
-set "Enabled"=reg_dword:1
-openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost]
-set "EnableWebContentEvaluation"=reg_dword:1
-
 ;https://msdn.microsoft.com/en-us/library/dd939844(v=ws.10).aspx
+;https://blogs.technet.microsoft.com/swisspfe/2018/04/13/win10-updates-store-gpos-dualscandisabled-sup-wsus/
 [Registry_hklm_disable_updates]
 openkey [HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate]
 set "DoNotConnectToWindowsUpdateInternetLocations"=reg_dword:1
 set "DisableWindowsUpdateAccess"=reg_dword:1
+set "SetDisableUXWUAccess"=reg_dword:1
+set "DisableDualScan"=reg_dword:1
 openkey [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\WindowsStore\WindowsUpdate]
 set "AutoDownload"=reg_dword:5
+; set ethernet and WiFi as metered connection
+; needs to change ownership of registry key
+; https://www.askvg.com/windows-tip-take-ownership-permission-of-registry-keys-from-command-line/
+; openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\DefaultMediaCost]
+; set "Ethernet"=reg_dword:2
+; set "WiFi"=reg_dword:2
+
+[ShellInAnIcon_disable_update_service]
+sc config wuauserv start= disabled
+net stop wuauserv
+
+[ShellInAnIcon_enable_update_service]
+sc config wuauserv start= auto
+net start wuauserv
 
 [Registry_hklm_enable_updates]
 openkey [HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate]
 set "DoNotConnectToWindowsUpdateInternetLocations"=reg_dword:0
 set "DisableWindowsUpdateAccess"=reg_dword:0
+set "DisableDualScan"=reg_dword:0
 openkey [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\WindowsStore\WindowsUpdate]
 set "AutoDownload"=reg_dword:4
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\DefaultMediaCost]
+set "Ethernet"=reg_dword:1
+set "WiFi"=reg_dword:1
+deleteKey [HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate\SetDisableUXWUAccess]
 
 ; https://social.technet.microsoft.com/Forums/en-US/62721efb-9eef-4ae3-a5bc-1333a1231dc0/disable-windows-defender?forum=win10itprogeneral
 [Registry_hklm_disable_defender]
@@ -405,10 +844,14 @@ deletekey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Disab
 [Registry_hklm_disable_wifi_sense]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config]
 set "AutoConnectAllowedOEM"=reg_dword:0
+openKey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots]
+set "Value"=reg_dword:0
 
 [Registry_hklm_enable_wifi_sense]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config]
 set "AutoConnectAllowedOEM"=reg_dword:1
+openKey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots]
+set "Value"=reg_dword:1
 
 ; https://docs.microsoft.com/en-us/windows/configuration/manage-connections-from-windows-operating-system-components-to-microsoft-services
 [Registry_hklm_disable_font_streaming]
@@ -449,12 +892,9 @@ set "DeferUpgradePeriod"=reg_dword:0
 [Registry_hklm_disable_flashplayer_autorun]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer\ActiveX Compatibility\{D27CDB6E-AE6D-11CF-96B8-444553540000}]
 set "Compatibility Flags"=reg_dword:00000400
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Internet Explorer\ActiveX Compatibility\{D27CDB6E-AE6D-11CF-96B8-444553540000}]
-set "Compatibility Flags"=reg_dword:00000400
 
 [Registry_hklm_enable_flashplayer_autorun]
 deletekey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer\ActiveX Compatibility\{D27CDB6E-AE6D-11CF-96B8-444553540000}]
-deletekey openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Internet Explorer\ActiveX Compatibility\{D27CDB6E-AE6D-11CF-96B8-444553540000}]
 
 ;http://flowest.blogspot.de/2015/08/windows-10-datenschutz-per-registry.html
 [Registry_hklm_disable_localization]
@@ -481,14 +921,16 @@ set "Status"=reg_dword:0
 [Registry_hklm_disable_online_search]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search]
 set "DisableWebSearch"=reg_dword:1
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Search]
-set "BingSearchEnabled"=reg_dword:0
+set "AllowCloudSearch"=reg_dword:0
+set "AllowSearchToUseLocation"=reg_dword:0
+set "ConnectedSearchUseWeb"=reg_dword:0
 
 [Registry_hklm_enable_online_search]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search]
 set "DisableWebSearch"=reg_dword:0
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Search]
-set "BingSearchEnabled"=reg_dword:1
+set "AllowCloudSearch"=reg_dword:1
+set "AllowSearchToUseLocation"=reg_dword:1
+set "ConnectedSearchUseWeb"=reg_dword:1
 
 ;https://www.stigviewer.com/stig/windows_7/2012-08-22/finding/V-15704
 ;https://www.windows-security.org/c60f66da12d91f4f0be57445a827e366/turn-off-handwriting-personalization-data-sharing
@@ -508,33 +950,57 @@ set "PreventHandwritingErrorReports"=reg_dword:0
 [Registry_hklm_disable_settings_sync]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync]
 set "SyncPolicy"=reg_dword:1
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Personalization]
+openKey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SmartGlass]
+set "BluetoothPolicy"=reg_dword:0
+set "UserAuthPolicy"=reg_dword:0
+
+[Registry_hkcu_disable_app_suggestion]
+openkey [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
+set "SubscribedContent-338388Enabled"=reg_dword:0
+set "SystemPaneSuggestionsEnabled"=reg_dword:0
+
+[Registry_hkcu_enable_app_suggestion]
+openkey [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
+set "SubscribedContent-338388Enabled"=reg_dword:1
+set "SystemPaneSuggestionsEnabled"=reg_dword:1
+
+[Registry_hkcu_disable_settings_sync]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync]
+set "SyncPolicy"=reg_dword:1
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Personalization]
 set "Enabled"=reg_dword:0
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\BrowserSettings]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\BrowserSettings]
 set "Enabled"=reg_dword:0
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Credentials]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Credentials]
 set "Enabled"=reg_dword:0
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Language]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Language]
 set "Enabled"=reg_dword:0
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Accessibility]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Accessibility]
 set "Enabled"=reg_dword:0
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Windows]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Windows]
 set "Enabled"=reg_dword:0
 
 [Registry_hklm_enable_settings_sync]
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync]
 set "SyncPolicy"=reg_dword:0
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Personalization]
+openKey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SmartGlass]
+set "BluetoothPolicy"=reg_dword:1
+set "UserAuthPolicy"=reg_dword:1
+
+[Registry_hkcu_enable_settings_sync]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync]
+set "SyncPolicy"=reg_dword:0
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Personalization]
 set "Enabled"=reg_dword:1
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\BrowserSettings]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\BrowserSettings]
 set "Enabled"=reg_dword:1
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Credentials]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Credentials]
 set "Enabled"=reg_dword:1
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Language]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Language]
 set "Enabled"=reg_dword:1
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Accessibility]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Accessibility]
 set "Enabled"=reg_dword:1
-openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Windows]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Windows]
 set "Enabled"=reg_dword:1
 
 ;https://techjourney.net/disable-or-uninstall-onedrive-completely-in-windows-10/
@@ -544,7 +1010,12 @@ set "DisableFileSyncNGSC"=reg_dword:1
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Onedrive]
 set "DisableLibrariesDefaultSaveToOneDrive"=reg_dword:1
 set "DisableFileSync"=reg_dword:1
-set "DisableMeteredNetworkFileSync"=reg_dword:1
+set "DisableFileSynciNGSC"=reg_dword:1
+set "DisableMeteredNetworkFileSync"=reg_dword:0
+openkey [HKEY_CLASSES_ROOT\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}]
+set "System.IsPinnedToNameSpaceTree"=reg_dword:0
+openkey [HKEY_CLASSES_ROOT\WOW6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}]
+set "System.IsPinnedToNameSpaceTree"=reg_dword:0
 
 [Registry_hklm_enable_onedrive]
 openKey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows]
@@ -552,22 +1023,94 @@ set "DisableFileSyncNGSC"=reg_dword:0
 openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Onedrive]
 set "DisableLibrariesDefaultSaveToOneDrive"=reg_dword:0
 set "DisableFileSync"=reg_dword:0
-set "DisableMeteredNetworkFileSync"=reg_dword:0
+set "DisableFileSynciNGSC"=reg_dword:0
+set "DisableMeteredNetworkFileSync"=reg_dword:1
+openkey [HKEY_CLASSES_ROOT\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}]
+set "System.IsPinnedToNameSpaceTree"=reg_dword:1
+openkey [HKEY_CLASSES_ROOT\WOW6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}]
+set "System.IsPinnedToNameSpaceTree"=reg_dword:1
+
+[Registry_hklm_disable_smbv1]
+;https://support.microsoft.com/en-us/help/2696547/how-to-detect-enable-and-disable-smbv1-smbv2-and-smbv3-in-windows-and
+openkey [HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters]
+set "SMB1"=reg_dword:0
+
+[Registry_hklm_enable_smbv1]
+openkey [HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters]
+set "SMB1"=reg_dword:1
+
+;https://getadmx.com/?Category=Windows_10_2016&Policy=Microsoft.Policies.WindowsExplorer::NoNewAppAlert&Language=de-de
+[Registry_hklm_disable_app_notification]
+openkey [HKLM\Software\Policies\Microsoft\Windows\Explorer]
+set "NoNewAppAlert"=REG_DWORD:1
+
+[Registry_hklm_enable_app_notification]
+openkey [HKLM\Software\Policies\Microsoft\Windows\Explorer]
+set "NoNewAppAlert"=REG_DWORD:0
+
+;https://social.technet.microsoft.com/Forums/azure/en-US/c8d95330-29f3-4d54-a8a9-abcaafa27992/windows-10-privacy-settings?forum=winserverGP
+;https://docs.microsoft.com/en-us/windows/configuration/manage-connections-from-windows-operating-system-components-to-microsoft-services
+;Windows 10, version 1703 options
+[Registry_hklm_disable_advertising_id]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo]
+set "Enabled"=reg_dword:0
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo]
+set "DisabledByGroupPolicy"=reg_dword:1
+
+[Registry_hklm_enable_advertising_id]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo]
+set "Enabled"=reg_dword:1
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo]
+set "DisabledByGroupPolicy"=reg_dword:0
+
+[Registry_hklm_dont_publish]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System]
+set "PublishUserActivities"=reg_dword:0
+
+[Registry_hklm_do_publish]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System]
+set "PublishUserActivities"=reg_dword:1
+
+; https://getadmx.com/?Category=Windows_10_2016&Policy=Microsoft.Policies.PushToInstall::DisablePushToInstall
+[Registry_hklm_disable_push]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\PushToInstall]
+set "DisablePushToInstall"=reg_dword:1
+
+[Registry_hklm_enable_push]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\PushToInstall]
+set "DisablePushToInstall"=reg_dword:0
 
 ;***********************
 ;**    HKCU-Enties ***
 ;***********************
 
-;http://www.techattend.com/disable-charms-bar-in-windows-8-1/
-;http://winaero.com/blog/how-to-disable-the-edge-panels-charms-bar-and-switcher-in-windows-8/
-[Registry_hkcu_charms_off]
-openkey [HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ImmersiveShell\EdgeUI]
-set "DisableCharmsHint"=reg_dword:1
+;https://www.ghacks.net/2018/04/07/microsoft-breaks-disable-web-search-in-windows-10-version-1803/
+[Registry_hkcu_enable_online_search]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Search]
+set "BingSearchEnabled"=reg_dword:1
+set "AllowSearchToUseLocation"=reg_dword:1
+set "CortanaConsent"=reg_dword:1
 
-[Registry_hkcu_charms_on]
-openkey [HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ImmersiveShell\EdgeUI]
-set "DisableCharmsHint"=reg_dword:0
+[Registry_hkcu_disable_online_search]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Search]
+set "BingSearchEnabled"=reg_dword:0
+set "AllowSearchToUseLocation"=reg_dword:0
+set "CortanaConsent"=reg_dword:0
 
+;https://social.technet.microsoft.com/Forums/azure/en-US/c8d95330-29f3-4d54-a8a9-abcaafa27992/windows-10-privacy-settings?forum=winserverGP
+[Registry_hkcu_disable_advertising_id]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo]
+set "Enabled"=reg_dword:0
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost]
+set "EnableWebContentEvaluation"=reg_dword:0
+
+[Registry_hkcu_enable_advertising_id]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo]
+set "Enabled"=reg_dword:1
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost]
+set "EnableWebContentEvaluation"=reg_dword:1
+
+;https://docs.microsoft.com/en-us/windows/configuration/manage-connections-from-windows-operating-system-components-to-microsoft-services
 [Registry_hkcu_disable_sending_feedback]
 openkey [HKEY_CURRENT_USER\Software\Microsoft\Siuf\Rules]
 set "PeriodInNanoSeconds"=reg_dword:0
@@ -578,14 +1121,113 @@ openkey [HKEY_CURRENT_USER\Software\Microsoft\Siuf\Rules]
 set "PeriodInNanoSeconds"=reg_dword:6048000000000
 set "NumberOfSIUFInPeriod"=reg_dword:1
 
-[Registry_hklm_disable_smbv1]
-openkey [HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters]
-set "SMB1"=reg_dword:0
+[Registry_hkcu_minimize_recommendations]
+openkey [HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\CloudContent]
+set "DisableTailoredExperiencesWithDiagnosticData"=reg_dword:1
+[Registry_hklm_minimize_recommendations]
+openkey [HKEY_LOCAL_MACHINE\System\ControlSet001\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener]
+set "Start"=reg_dword:0
+openkey [HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener]
+set "Start"=reg_dword:0
 
-[Registry_hklm_enable_smbv1]
-openkey [HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters]
-set "SMB1"=reg_dword:1
+[Registry_hkcu_maximize_recommendations]
+openkey [HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\CloudContent]
+set "DisableTailoredExperiencesWithDiagnosticData"=reg_dword:0
+[Registry_hklm_maximize_recommendations]
+openkey [HKEY_LOCAL_MACHINE\System\ControlSet001\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener]
+set "Start"=reg_dword:1
+openkey [HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener]
+set "Start"=reg_dword:1
 
+; https://www.stigviewer.com/stig/windows_7/2014-04-02/finding/V-15715
+; https://getadmx.com/?Category=Windows_8.1_2012R2&Policy=Microsoft.Policies.WindowsErrorReporting::WerAutoApproveOSDumps_1
+[Registry_hkcu_disable_error_report]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting]
+set "Disabled"=reg_dword:1
+set "AutoApproveOSDumps"=reg_dword:0
+set "DontSendAdditionalData"=reg_dword:1
+
+[Registry_hkcu_enable_error_report]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting]
+set "Disabled"=reg_dword:0
+set "AutoApproveOSDumps"=reg_dword:1
+set "DontSendAdditionalData"=reg_dword:0
+
+;https://www.tenforums.com/tutorials/68217-turn-off-automatic-installation-suggested-apps-windows-10-a-2.html
+[Registry_hkcu_disable_suggested_apps]
+openkey [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager
+set "SilentInstalledAppsEnabled"=reg_dword:0
+set "ContentDeliveryAllowed"=reg_dword:0
+set "PreInstalledAppsEnabled"=reg_dword:0
+set "OemPreInstalledAppsEnabled"=reg_dword:0
+set "SoftLandingEnabled"=reg_dword:0
+ 
+[Registry_hkcu_enable_suggested_apps]
+openkey [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager
+set "SilentInstalledAppsEnabled"=reg_dword:1
+set "ContentDeliveryAllowed"=reg_dword:1 
+set "PreInstalledAppsEnabled"=reg_dword:1
+set "OemPreInstalledAppsEnabled"=reg_dword:1
+set "SoftLandingEnabled"=reg_dword:0
+
+; https://answers.microsoft.com/de-de/windows/forum/windows_10-start-winpc/creators-update-meistvervendete-apps-werden-nicht/741ea23b-ca4c-45cc-9bf7-46f82c7bc739
+; https://social.technet.microsoft.com/Forums/ie/en-US/64b67188-4833-421a-8775-2a15d716e6a0/disable-quotshow-recently-added-appsquot?forum=win10itprogeneral
+[Registry_hkcu_disable_recent_apps]
+openkey [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+set "Start_TrackDocs"=reg_dword:0
+set "Start_TrackProgs"=reg_dword:0
+
+[Registry_hkcu_enable_recent_apps]
+openkey [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+set "Start_TrackDocs"=reg_dword:1
+set "Start_TrackProgs"=reg_dword:1
+
+[Registry_hkcu_hide_ext]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+set "HideFileExt"=reg_dword:0
+
+[Registry_hkcu_unhide_ext]
+openkey [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+set "HideFileExt"=reg_dword:1
+
+[Registry_hkcu_thispc_yes]
+openkey [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+set "LaunchTo"=reg_dword:1
+
+[Registry_hkcu_thispc_no]
+openkey [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+set "LaunchTo"=reg_dword:0
+
+; https://www.tenforums.com/tutorials/7078-turn-off-show-all-folders-windows-10-navigation-pane.html
+; For Windows Update for Business policies to be honored, the diagnostic data level of the device must be set to 1 (Basic) or higher. If it is set to 0 (Security), Windows Update for Business policies will have no effect. 
+[Registry_hkcu_show_all_folders]
+openkey [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+set "NavPaneShowAllFolders"=reg_dword:1
+
+[Registry_hkcu_hide_all_folders]
+openkey [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+set "NavPaneShowAllFolders"=reg_dword:0
+
+;https://docs.microsoft.com/en-us/windows/deployment/update/waas-configure-wufb
+[Registry_hklm_deferfeatureupdatesperiodindays_policy]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\\Policies\Microsoft\Windows\WindowsUpdate]
+;Set "DeferFeatureUpdatesPeriodInDays"="$deferfeatureupdatesperiodindays$"
+Set "DeferFeatureUpdatesPeriodInDays"=$deferfeatureupdatesperiodindays$
+
+[Registry_hklm_deferqualityupdatesperiodindays_policy]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\\Policies\Microsoft\Windows\WindowsUpdate]
+;Set "DeferQualityUpdatesPeriodInDays"="$deferqualityupdatesperiodindays$"
+Set "DeferQualityUpdatesPeriodInDays"=$deferqualityupdatesperiodindays$
+
+[Registry_hklm_deferfeatureupdatesperiodindays]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings]
+;Set "DeferFeatureUpdatesPeriodInDays"="$deferfeatureupdatesperiodindays$"
+Set "DeferFeatureUpdatesPeriodInDays"=$deferfeatureupdatesperiodindays$
+
+[Registry_hklm_deferqualityupdatesperiodindays] 
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings]
+;Set "DeferQualityUpdatesPeriodInDays"="$deferqualityupdatesperiodindays$"
+Set "DeferQualityUpdatesPeriodInDays"=$deferqualityupdatesperiodindays$
 
 ;***********************
 ;**    Winbatch ***

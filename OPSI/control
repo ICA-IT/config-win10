@@ -1,7 +1,6 @@
 [Package]
-version: 8
+version: 6
 depends: 
-incremental: False
 
 [Product]
 type: localboot
@@ -9,7 +8,7 @@ id: config-win10
 name: Configure Windows 10
 description: Configure various Windows 10 settings like lockscreen, hibernationboot, telemetry sending and update behavior.
 advice: 
-version: 4.0.7
+version: 4.1.1
 priority: 85
 licenseRequired: False
 productClasses: 
@@ -19,7 +18,7 @@ updateScript:
 alwaysScript: 
 onceScript: 
 customScript: 
-userLoginScript: 
+userLoginScript: setup.opsiscript
 
 [ProductProperty]
 type: bool
@@ -29,43 +28,110 @@ default: True
 
 [ProductProperty]
 type: bool
+name: show_all_folder_in_navbar
+description: You can use the navigation pane (the left pane) in File Explorer to find files and folders on your PC. If you like, you can select to show all the folders on your PC in the navigation pane, including your personal folder, Control Panel, and Recycle Bin.
+default: True
+
+[ProductProperty]
+type: bool
+name: show_drive_letter_first
+description: Show drive letters in front of drive label
+default: True
+
+[ProductProperty]
+type: bool
+name: show_thispc_instead_of_quicklaunch
+description: When enabled the Explorer by default opens 'This PC' instead of a quick access screen.
+default: True
+
+[ProductProperty]
+type: bool
+name: remove_edge_from_desktop
+description: Starting with Win10 1803: Removes the edge desktop shortcut from the desktop
+default: True
+
+[ProductProperty]
+type: bool
+name: allow_useractivity_publishing
+description: This policy setting determines whether User Activities can be published. If you enable this policy setting, activities of type User Activity are allowed to be published. If you disable this policy setting, activities of type User Activity are not allowed to be published. Policy change takes effect immediately.
+default: False
+
+[ProductProperty]
+type: bool
+name: hide_known_file_extensions
+description: Hide known and most famous file extensions, like .exe or .txt
+default: True
+
+[ProductProperty]
+type: bool
+name: minimize_recommendations
+description: If you enable this policy setting, Windows will not use diagnostic data from this device (this data may include browser, app and feature usage, depending on the "diagnostic data" setting value) to customize content shown on lock screen, Windows tips, Microsoft consumer features and other related features. If these features are enabled, users will still see recommendations, tips and offers, but they may be less relevant.
+default: True
+
+[ProductProperty]
+type: bool
 name: disable_lock_screen
+description: Disable the default Widnows 10 lock screen
 default: True
 
 [ProductProperty]
 type: bool
 name: disable_telemetry
-description: Disable telemetry data transmission
+description: Disable telemetry data transmission, depending on used Windows 10 Version some data still might be transmitted.
+default: True
+
+[ProductProperty]
+type: bool
+name: disable_suggested_silent_app_installation
+description: Starting with Windows 10 version 1607 Anniversary Update, Windows will silently automatically download and install suggested apps like Age of Empires: Castle Siege, Asphalt 8: Airborne, Candy Crush Soda Saga, FarmVille2: Country Escape, Flipboard, Minecraft: Windows 10 edition, Netflix, Pandora, Twitter, World of Tanks: Blitz, etc... from the Windows Store without any confirmation by default. This will happen to both local accounts and Microsoft accounts on the PC while connected to the Internet.
+default: True
+
+[ProductProperty]
+type: bool
+name: disable_app_suggestion_in_startmenu
+description: In Windows 10, you will occasionally see app suggestions on Start such as Candy Crush Soda Saga, Twitter, Minecraft, Flipboard etc... in All Apps on the left side of Start. If you click/tap on the suggested app, it will open to the app in Store where you can view additional information or download and install it.
 default: True
 
 [ProductProperty]
 type: bool
 name: disable_cortana
-description: Disable Cortana assistant
+description: Disable Cortana assistant as it transmits data to Miscrosoft.
+default: True
+
+[ProductProperty]
+type: bool
+name: disable_error_report
+description: Turn off Windows Error Reporting to Microsoft. This does not apply to 3rd party applications. If you enable this policy setting, any memory dumps are uploaded according to the default consent and notification settings.
 default: True
 
 [ProductProperty]
 type: bool
 name: disable_customer_experience
-description: Disable customer experience program
+description: Disable customer experience program to disable software and hardware data transmission
+default: True
+
+[ProductProperty]
+type: bool
+name: disable_push_install
+description: If you enable this setting, users will not be able to push Apps to this device from the Microsoft Store running on other devices or the web.
 default: True
 
 [ProductProperty]
 type: bool
 name: disable_mrt
-description: Disable Malicious Software Removal Tool
+description: Disable Malicious Software Removal Tool as it scans files on hard disk and transmits data.
 default: True
 
 [ProductProperty]
 type: bool
 name: defer_upgrade
-description: Defer Windows 10 Upgrade
+description: Defer Windows 10 Upgrade for 8 months and updates for 4 weeks. After 8 Months Windows 10 might be upgraded, feature updates aren't installed for 4 weeks. Security updates are installed anyway.
 default: True
 
 [ProductProperty]
 type: bool
 name: disable_onedrive_sync
-description: Disable the OneDrive file synchronization
+description: Disable the OneDrive file synchronization, the OneDrive program remains installed.
 default: True
 
 [ProductProperty]
@@ -73,14 +139,14 @@ type: unicode
 name: config_updates
 multivalue: False
 editable: False
-description: Set Windows-Update behavior
+description: Set Windows-Update behavior to select prefered way of Windows 10 updates/upgrades.
 values: ["AllowPeerToPeer", "LocalPeerToPeer", "MicrosoftOnly"]
 default: ["MicrosoftOnly"]
 
 [ProductProperty]
 type: bool
 name: disable_mac
-description: Disable Microsoft Account communication
+description: Disable Microsoft Account communication, as it saves browser, search, position and Cortana data.
 default: False
 
 [ProductProperty]
@@ -92,19 +158,31 @@ default: False
 [ProductProperty]
 type: bool
 name: disable_updates
-description: Disable Windows Updates
+description: Disable Windows Updates. This blocks all outgoing connections to Windows update servers.
+default: False
+
+[ProductProperty]
+type: bool
+name: disable_update_service
+description: Disables the Windows update service. Caution: this might lead to errors when using DISM to integrate patches etc.
 default: False
 
 [ProductProperty]
 type: bool
 name: disable_defender
-description: Disable Microsoft Windows Defender
+description: Disable Microsoft Windows Defender as it scans files and transmits data to Microsoft.
 default: False
 
 [ProductProperty]
 type: bool
+name: disable_recent_apps
+description: Disable "Show most used apps" and "Show recently opened apps" in the start menu
+default: True
+
+[ProductProperty]
+type: bool
 name: disable_wifi_sense
-description: Disable Wi-Fi Sense
+description: Disable Wi-Fi Sense. This service collects data on available WiFi networks and transmits the data to Microsoft.
 default: False
 
 [ProductProperty]
@@ -116,13 +194,13 @@ default: False
 [ProductProperty]
 type: bool
 name: disable_font_streaming
-description: Disable font streaming of not installed fonts
+description: Disable font streaming of not installed fonts. This service collects data of what has been written on the machine.
 default: False
 
 [ProductProperty]
 type: bool
 name: defer_upgrade
-description: Defer Windows 10 Upgrade
+description: Defer Windows 10 Upgrade for 8 months and defer feature updates for 4 weeks. Securityupdates are installed anyway.
 default: True
 
 [ProductProperty]
@@ -134,7 +212,7 @@ default: False
 [ProductProperty]
 type: bool
 name: disable_location_sensors
-description: Disable location and sensor detection
+description: Disable location and sensor detection.
 default: True
 
 [ProductProperty]
@@ -146,31 +224,147 @@ default: True
 [ProductProperty]
 type: bool
 name: disable_handwrite_sharing
-description: Tablet-PC: Disable sharing of handriting information
+description: Tablet-PC: Disable sharing of handwriting information. This service collect data on Touch devices to improve handwriting recognition.
 default: True
 
 [ProductProperty]
 type: bool
 name: sync_settings
-description: Sync settings with AccountID
+description: Sync settings with AccountID. Preferences and variosu other data are synced with an unique AccountID when this service is turned on.
 default: False
 
 [ProductProperty]
 type: bool
 name: disable_smbv1
-description: Disable SMBV1 protocol
-default: False
+description: Disable SMBV1 protocol for security reasons.
+default: True
 
 [ProductProperty]
 type: unicode
 name: change_power_plan
 multivalue: False
 editable: False
-description: Change the machine power plan
+description: Change the machines power plan.
 values: ["balanced", "high_performance", "power_saver"]
 default: ["balanced"]
 
+[ProductProperty]
+type: unicode
+name: deferfeatureupdatesperiodindays
+multivalue: False
+editable: False
+description: You can defer receiving these Feature Updates for a period of up to 365 days from their release by setting  https://docs.microsoft.com/en-us/windows/deployment/update/waas-configure-wufb
+values: ["0", "10", "100", "110", "120", "130", "140", "150", "160", "170", "180", "190", "20", "200", "210", "220", "230", "240", "250", "260", "270", "280", "290", "30", "300", "310", "320", "330", "365", "40", "50", "60", "70", "80", "90"]
+default: ["365"]
+
+[ProductProperty]
+type: unicode
+name: deferqualityupdatesperiodindays
+multivalue: False
+editable: False
+description: You can defer receiving these Quality Updates for a period of up to 35 days from their release https://docs.microsoft.com/en-us/windows/deployment/update/waas-configure-wufb
+values: ["0", "1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "2", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "3", "30", "4", "5", "6", "7", "8", "9"]
+default: ["30"]
+
+[ProductProperty]
+type: bool
+name: no_new_app_install_notification
+description: If true, this will disable the notification on a new application install.
+default: False
+
 [Changelog]
+config-win10 (4.1.1-6);. stable; urgency=low
+  * removing key SetDisableUXWAccess when enabling updates
+  * new property: no_new_app_install_notification
+
+ -- Mathias Radtke <m.radtke@uib.de> Tue, 07 May 2018 10:41:00 +0200
+
+config-win10 (4.1.1-5); stable; urgency=low
+  * try to fix errors in Registry_hkcu_enable_settings_sync
+  * removed ;Registry_hklm_update_enable_search /sysnative
+  * added (see https://docs.microsoft.com/en-us/windows/deployment/update/waas-configure-wufb)
+          property DeferFeatureUpdatesPeriodInDays
+          property DeferQualityUpdatesPeriodInDays
+ -- Bardo Wolf <b.wolf@uib.de> Wed, 30 Nov 2018
+
+config-win10 (4.1.1-4); stable; urgency=low
+  * Property name: disable_smbv1 default set to true
+  * remove in Login Mode erroneouasly /ALLNTUSERDATS
+  * split minimize_recommendation in hkcu and hklm, add hkcu to Login Mode
+  * change show_all_folder_in_navbar to /ALLNTUSERDATS and add to Login mode
+  * change show_thispc_instead_of_quicklaunch to /ALLNTUSERDATS and add to Login mode
+  * change hide_known_file_extensions to /ALLNTUSERDATS and add to Login mode
+  * change disable_app_suggestion_in_startmenu to /ALLNTUSERDATS and add to Login mode
+  * change disable_recent_apps to /ALLNTUSERDATS and add to Login mode
+  * change disable_suggested_silent_app_installation to /ALLNTUSERDATS and add to Login mode
+  * change disable_error_report to /ALLNTUSERDATS and add to Login mode
+
+  * Registry_hklm_disable_push added 32AND 64Bit
+  * Registry_hklm_do_publish added 32AND 64Bit
+
+ -- Bardo Wolf <b.wolf@uib.de> Wed, 28 Nov 2018
+
+config-win10 (4.1.1-3); stable; urgency=low
+
+  * fixed double initialization of disable_update_service
+
+-- Mathias Radtke <m.radtke@uib.de> Wed, 21 Nov 2018 11:20:00 +0200
+
+config-win10 (4.1.1-2); stable; urgency=low
+
+  * corrected userlogin script behaviour
+
+ -- Mathias Radtke <m.radtke@uib.de> Wed, 14 Nov 2018 14:00:00 +0100
+
+config-win10 (4.1.1-1); stable; urgency=low
+
+  * added new properties:
+    * disable_push_install
+    * disable_error_report
+    * disable_suggested_silent_app_installation
+    * disable_app_suggestion_in_startmenu
+    * minimize_recommendations
+    * hide_known_file_extensions
+    * allow_useractivity_publishing
+    * remove_edge_from_desktop
+    * show_thispc_instead_of_quicklaunch
+    * show_drive_letter_first
+    * show_all_folder_in_navbar
+
+ -- Mathias Radtke <m.radtke@uib.de> Tue, 25 Sep 2018 13:40:00 +0200
+
+config-win10 (4.1.0-5); stable; urgency=low
+
+  * New property: disable_updates_service
+  * on 64bit systems: set registry sysnative and 32bit
+
+ -- Mathias Radtke <m.radtke@uib.de> Fri, 31 Aug 2018 11:08:00 +0200
+
+config-win10 (4.1.0-4); stable; urgency=low
+
+  * reworked disable_updates function
+
+ -- Mathias Radtke <m.radtke@uib.de> Tue, 21 Aug 2018 10:33:00 +0200
+
+config-win10 (4.1.0-3); stable; urgency=low
+
+  * Added registry settings to diable dualscan when using disable_updates property
+
+ -- Mathias Radtke <m.radtke@uib.de> Fri, 17 Aug 2018 11:46:00 +0200
+config-win10 (4.1.0-2); stable; urgency=low
+
+  * fixes #3496 windows 10 1803: websuche abschalten geändert
+  * adding loginscript and fixes allntuserdats
+
+ -- Bardo Wolf <b.wolf@uib.de> Mon, 07 May 2018 10:50:00 +0200
+
+
+config-win10 (4.1.0-1); stable; urgency=low
+
+  * fixed flashplayer architecture logic
+
+ -- Andre Neugebauer <a.neugebauer@uib.de> Mon, 16 Apr 2018 14:50:00 +0200
+
 config-win10 (4.0.7-8); stable; urgency=low
 
   * fixed broken loginscript setup
