@@ -7,7 +7,7 @@ type: localboot
 id: config-win10
 name: Configure Windows 10
 description: Configure various Windows 10 settings like lockscreen, hibernationboot, telemetry sending and update behavior.
-advice: 
+advice: WARNING!! Do NOT use on a computer joined to an Active Directory Domain Controller!
 version: 4.1.2
 priority: 85
 licenseRequired: False
